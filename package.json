@@ -1,0 +1,7 @@
+{
+  "name": "agenda-vital",
+  "private": true,
+  "type": "module",
+  "description": "Agenda Vital: app personal instalable en el iPhone",
+  "engines": { "node": ">=18" }
+}
