@@ -603,9 +603,16 @@ function assistant(o){o=o.trim().replace(/[.!?¿¡]+/g,'').trim();const t=nrm(o)
   if(/^(nuevo habito|(anade|crea) (el |un )?habito)/.test(t)){const x=cap(o.replace(/^(nuevo h[áa]bito|(añade|anade|crea) (el |un )?h[áa]bito)\s*:?\s*/i,'').trim());if(!x)return '¿Qué hábito?';S.habits.push({id:uid(),name:x});return `Hábito creado: ${x}.`}
   // tests del carnet (modo básico)
   if(/\btests?\b/.test(t)&&/(fallo|perfecto|sin fallos|aprob|hecho|he hecho)/.test(t)){const k=+((t.match(/(\d+)\s*tests?/)||[])[1]||1),f=/sin fallos|perfecto/.test(t)?0:+((t.match(/(\d+)\s*fallos?/)||[])[1]||0);for(let i=0;i<Math.min(k,20);i++)addCTest(f);return `Apuntado${k>1?'s '+k+' tests':' test'} con ${f} fallo${f===1?'':'s'}. Llevas ${testsDone()} de ${TESTS_DAY} hoy.`}
-  // cumpleaños (modo básico)
-  if((m=t.match(/cumple(?:anos)?\s+(?:de\s+)?([a-z]+)\s+(?:el\s+)?(\d{1,2})\s+(?:de\s+)?([a-z]+)/))){const MES={ene:1,feb:2,mar:3,abr:4,may:5,jun:6,jul:7,ago:8,sep:9,set:9,oct:10,nov:11,dic:12},mo=MES[m[3].slice(0,3)],d=+m[2];
-    if(mo&&d>=1&&d<=31){const name=cap(m[1]);S.bdays.push({id:uid(),name,date:'1900-'+pad(mo)+'-'+pad(d)});return `Apuntado el cumple de ${name}: ${d}/${mo}.`}}
+  // cumpleaños (modo básico): «cumple Diogo 24 de nov», «el cumpleaños de mi madre es el 5 de mayo», «Mauro cumple el 3/4», «24 nov cumple de Sergio»
+  if(/cumple/.test(t)){const MES={ene:1,feb:2,mar:3,abr:4,may:5,jun:6,jul:7,ago:8,sep:9,set:9,oct:10,nov:11,dic:12};
+    let d=0,mo=0,dm=t.match(/(\d{1,2})\s*(?:\/|-|de\s+|\s)\s*(\d{1,2}\b|ene\w*|feb\w*|mar\w*|abr\w*|may\w*|jun\w*|jul\w*|ago\w*|sep\w*|set\w*|oct\w*|nov\w*|dic\w*)/);
+    if(dm){d=+dm[1];mo=/^\d/.test(dm[2])?+dm[2]:MES[dm[2].slice(0,3)]}
+    let yr=1900;const ym=t.match(/\b(19[3-9]\d|20[0-2]\d)\b/);if(ym)yr=+ym[1];
+    const STOPW=/^(el|la|los|las|mi|tu|su|de|del|es|que|cumple|cumpleanos|apunta|anade|pon|guarda|recuerda|recuerdame|hoy|manana|y|a|en)$/;
+    const words=o.replace(/[\d\/\-]+/g,' ').replace(/\b(de\s+)?(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre|ene|feb|mar|abr|may|jun|jul|ago|sep|set|oct|nov|dic)\b\.?/gi,' ').split(/\s+/).filter(w=>w&&!STOPW.test(nrm(w))&&!/^cumple/i.test(w)&&!/^años?$/i.test(w));
+    const name=cap(words.join(' ').trim());
+    if(name&&mo>=1&&mo<=12&&d>=1&&d<=31){S.bdays.push({id:uid(),name,date:yr+'-'+pad(mo)+'-'+pad(d)});return `Apuntado el cumple de ${name}: ${d} de ${['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'][mo-1]}.`}
+    if(name&&!dm)return `¿Qué día es el cumple de ${name}? Escríbelo así: «cumple ${name} 24 de noviembre».`}
   // tareas y gestiones
   if(/(tarea|tengo que|recuerdame|recordar|cita|hay que|apunta|anade|^pon |gestion|tramite|renovar|llamar|pedir)/.test(t)){const title=cleanTitle(o);if(!title)return '¿Qué tarea apunto?';
     const kind=/(cita|medico|dentista|fisio|peluquer)/.test(t)?'Cita':/(tramite|renovar|entregar|pagar|dni|licencia|seguro)/.test(t)?'Trámite':'Tarea',must=/(obligatori|importante|si o si)/.test(t),date=dateIn(t),time=timeIn(t);
