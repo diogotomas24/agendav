@@ -1,4 +1,5 @@
-// Asistente de Agenda Vital: recibe el texto preparado por la app y se lo pasa a Gemini.
+// Asistente de Agenda Vital: recibe el texto (y, si hay, una foto) preparado por la app y se lo pasa a Gemini.
+// Modos: 'assistant' (apunta cosas), 'food' (calorías y macros de un plato), 'ticket' (lee un ticket).
 // Variables de entorno en Vercel:
 //   GEMINI_API_KEY  (obligatoria)  clave gratuita de Google AI Studio
 //   APP_TOKEN       (recomendada)  una contraseña tuya; la app la envía para que nadie más use tu cupo
@@ -16,6 +17,12 @@ export default async function handler(req, res) {
   if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = {}; } }
   const prompt = String(body.prompt || '').slice(0, 60000);
   if (!prompt) return res.status(400).json({ error: 'empty_prompt' });
+  const mode = ['food', 'ticket'].includes(body.mode) ? body.mode : 'assistant';
+  const parts = [{ text: prompt }];
+  const img = body.image;
+  if (img && typeof img.data === 'string' && /^image\/(jpeg|png|webp|heic)$/.test(img.mime || '') && img.data.length < 4_000_000) {
+    parts.push({ inline_data: { mime_type: img.mime, data: img.data } });
+  }
 
   const model = process.env.GEMINI_MODEL || 'gemini-flash-latest';
   let r;
@@ -24,7 +31,7 @@ export default async function handler(req, res) {
       method: 'POST',
       headers: { 'content-type': 'application/json', 'x-goog-api-key': key },
       body: JSON.stringify({
-        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        contents: [{ role: 'user', parts }],
         generationConfig: { responseMimeType: 'application/json', temperature: 0.2 }
       })
     });
@@ -42,5 +49,6 @@ export default async function handler(req, res) {
     try { out = m ? JSON.parse(m[0]) : null; } catch { out = null; }
   }
   if (!out || typeof out !== 'object') return res.status(502).json({ error: 'bad_json' });
+  if (mode !== 'assistant') return res.status(200).json({ data: out });
   return res.status(200).json({ reply: String(out.reply || ''), actions: Array.isArray(out.actions) ? out.actions : [] });
 }

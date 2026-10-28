@@ -106,6 +106,30 @@ details.add form{display:flex;flex-direction:column;gap:10px;padding-bottom:16px
 .spark{width:100%;height:40px}
 .aibar{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:8px 8px 8px 16px;width:100%;text-align:left;color:var(--muted)}
 .aibar span{flex:1}
+.folders{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.folder{position:relative;border:none;background:transparent;padding:16px 0 0;text-align:left;color:var(--fg);min-width:0}
+.ftab{position:absolute;top:0;left:0;width:46%;height:24px;border-radius:12px 12px 0 0;background:var(--fc)}
+.fbody{display:flex;flex-direction:column;gap:5px;background:color-mix(in srgb,var(--fc) 20%,var(--card));border-top:4px solid var(--fc);border-radius:0 16px 16px 16px;padding:14px;min-height:136px}
+.fbody b{font-size:17px;overflow-wrap:anywhere}
+.finit{width:38px;height:38px;border-radius:11px;background:var(--fc);color:#111;font-weight:800;font-size:18px;display:flex;align-items:center;justify-content:center}
+.fmeta{font-size:12px;font-weight:700;color:var(--fc);margin-top:auto}
+.swatch{width:34px;height:34px;border-radius:50%;border:3px solid transparent}
+.swatch.on{border-color:var(--fg)}
+.vh{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none}
+.filebtn{display:flex;align-items:center;justify-content:center;position:relative;cursor:pointer}
+.ringbox{position:relative;width:124px;height:124px;flex:none}
+.ringtxt{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.ringtxt b{font-size:26px}.ringtxt span{font-size:11px;color:var(--muted)}
+.macros{display:flex;gap:10px;font-size:12px;font-weight:700}.macros i{font-style:normal}
+.donutwrap{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.donut{width:140px;height:140px;flex:none}
+.legend2{flex:1;min-width:160px;display:flex;flex-direction:column;gap:8px;font-size:14px}
+.catdot{width:28px;height:28px;border-radius:9px;color:#111;font-weight:800;font-size:13px;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.catgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.catbtn{border:1px solid var(--line);background:var(--card2);border-radius:14px;min-height:70px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-size:11px;font-weight:700;padding:6px 2px}
+.catbtn span:last-child{overflow:hidden;text-overflow:ellipsis;max-width:100%;white-space:nowrap}
+.bigamt{font-size:30px!important;font-weight:800;text-align:center;min-height:60px!important}
+.dayhead{display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:var(--muted);text-transform:capitalize;padding:10px 0 2px;border-bottom:1px solid var(--line)}
 .cal14{display:grid;grid-template-columns:repeat(14,minmax(0,1fr));gap:4px;height:90px}
 .d14{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0}
 .d14b{flex:1;width:100%;display:flex;align-items:flex-end;background:var(--card2);border-radius:4px;overflow:hidden}
@@ -127,7 +151,6 @@ input,select,textarea,textarea.mono{font-size:16px!important}
 .aibar input{flex:1;min-width:0;border:none;background:transparent;min-height:36px;padding:0;color:var(--fg)}
 .aiico{width:36px;height:36px;flex:none;border:none;background:transparent;color:var(--accent);display:flex;align-items:center;justify-content:center;padding:0}
 .aisend{width:36px;height:36px;flex:none;border:none;border-radius:10px;background:var(--accent);color:var(--on-accent);font-size:18px;font-weight:800}
-body[data-sec="gym"]{--accent:#A3E06B}body[data-sec="run"]{--accent:#6EA8FF}body[data-sec="clases"]{--accent:#C9A2FF}body[data-sec="dinero"]{--accent:#F5C451}
 nav .plus span{width:50px;height:50px;border-radius:16px;background:var(--accent);color:var(--on-accent);font-size:30px;font-weight:700;display:flex;align-items:center;justify-content:center;line-height:1}
 .chip{min-height:40px;border:1px solid var(--line);background:var(--card2);border-radius:999px;padding:0 14px;font-weight:700;font-size:13px}
 .chip.on{background:var(--ok);color:var(--on-accent);border-color:var(--ok)}
@@ -171,7 +194,11 @@ nav svg{width:22px;height:22px}
 
 <script>
 const KEY='agendaVital.v1';
-const CATS=['Gimnasio','Comida','Ocio','Transporte','Clases','Ropa','Deudas','Otros'];
+const CATS=['Comida','Transporte','Gimnasio','Ocio','Ropa','Casa','Salud','Suscripciones','Regalos','Clases','Deudas','Ahorro','Otros'];
+const INCATS=['Clases','Nómina','Regalos','Ventas','Deudas','Otros'];
+const ALLCATS=[...new Set([...CATS,...INCATS])];
+const CATCOL={Comida:'#F5C451',Transporte:'#6EA8FF',Gimnasio:'#A3E06B',Ocio:'#C9A2FF',Ropa:'#FF8FC7',Casa:'#FFB86B',Salud:'#5FD3C6',Suscripciones:'#9AA7FF',Regalos:'#FF8A5B',Clases:'#E8E8E8',Deudas:'#B0B4BE',Ahorro:'#7BE0A0',Nómina:'#A3E06B',Ventas:'#5FD3C6',Otros:'#8A8F99'};
+const catCol=c=>CATCOL[c]||'#8A8F99';
 const pad=n=>String(n).padStart(2,'0');
 const ymd=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
 const TODAY=ymd(new Date());
@@ -187,7 +214,8 @@ const hm=m=>Math.floor(m/60)+' h '+pad(Math.round(m%60))+' min';
 
 const COLORS={task:'#F5C451',clase:'#C9A2FF',equipo:'var(--warn)',yo:'var(--ok)',cumple:'var(--pink)'};
 
-const DEF_RT=()=>[{id:uid(),name:'Empuje',exs:['Press banca','Press militar','Fondos','Extensión de tríceps']},{id:uid(),name:'Tirón',exs:['Dominadas','Remo con barra','Jalón al pecho','Curl de bíceps']},{id:uid(),name:'Pierna',exs:['Prensa','Sentadilla','Peso muerto rumano','Gemelos']}];
+const CORE_RT=()=>({id:uid(),name:'Core',exs:['Plancha','Crunch abdominal','Elevación de piernas','Rueda abdominal']});
+const DEF_RT=()=>[{id:uid(),name:'Empuje',exs:['Press banca','Press militar','Fondos','Extensión de tríceps']},{id:uid(),name:'Tirón',exs:['Dominadas','Remo con barra','Jalón al pecho','Curl de bíceps']},{id:uid(),name:'Pierna',exs:['Prensa','Sentadilla','Peso muerto rumano','Gemelos']},CORE_RT()];
 const DEF_PLAN=()=>['run:larga','rt:Empuje','run:series','rt:Tirón','run:ritmo','rt:Pierna',''];
 function seed(){const a=uid(),b=uid();return{
   example:true, goals:{water:8,kcal:2400,km:30},
@@ -234,9 +262,11 @@ let S;
 try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){S=null}
 if(!S||!S.tasks||S.example)S=seed();
 else S={...EMPTY(),...S};
+if(!S.coreAdded){if(!S.routines.some(r=>String(r.name).toLowerCase()==='core'))S.routines.push(CORE_RT());S.coreAdded=true}
+S.goals={prot:140,carb:280,fat:75,...S.goals};S.budgets=S.budgets||{};S.pots=S.pots||[];
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
 
-let tab='hoy', sub={agenda:'semana',cuerpo:'gym',personas:'alumnos',mas:'',dinero:'movs'}, pendingDel=null, showDone=false;
+let tab='hoy', sub={agenda:'semana',cuerpo:'gym',personas:'alumnos',mas:'',dinero:'resumen'}, pendingDel=null, showDone=false;
 let calMonth=TODAY.slice(0,7), calSel=TODAY, quiz=null, selStu=null, selEx=null, selRt=null, selRun=null, editing=null, quick=false, openForm=null, focusForm=false, session=null, weekStart=addDays(-((new Date().getDay()+6)%7));
 const rest={end:0,timer:null};
 
@@ -277,7 +307,7 @@ function addForm(kind,title,fields,btn='Guardar',open=false){
   const f=fields.map(([n,l,t,o,w,x])=>{const id=kind+'_'+n;let input;
     if(t==='hidden')return `<input type="hidden" name="${n}" value="${esc(o)}">`;
     if(t==='select')input=`<select id="${id}" name="${n}">${o.map(v=>Array.isArray(v)?`<option value="${esc(v[0])}">${esc(v[1])}</option>`:`<option>${esc(v)}</option>`).join('')}</select>`;
-    else input=`<input id="${id}" name="${n}" type="${t}" ${t==='date'&&!x?`value="${TODAY}"`:''} ${x||''}>`;
+    else input=`<input id="${id}" name="${n}" type="${t==='number'?'text':t}" ${t==='number'?'inputmode="decimal" autocomplete="off"':''} ${t==='date'&&!x?`value="${TODAY}"`:''} ${x||''}>`;
     return `<label class="lbl ${w?'wide':''}" for="${id}">${l}${input}</label>`}).join('');
   return `<details class="add" ${open||openForm===kind?'open':''}><summary>${title}</summary><form data-form="${kind}"><div class="grid2">${f}</div><button class="btn" type="submit">${btn}</button></form></details>`;
 }
@@ -361,7 +391,7 @@ const EXSVG={
   gemelos:`<rect x="22" y="54" width="20" height="5" rx="1" opacity=".5"/>${HEAD(32,10)}<path d="M32 15V34M32 34L30 48L32 53M32 34L34 48L36 53M32 19L27 32M32 19L37 32"/><path d="M50 32V14M45 19L50 14L55 19"/>`,
   plancha:`<path d="M6 50H58" opacity=".5"/>${HEAD(12,33)}<path d="M17 36L54 42L57 49M20 37L20 46L29 46"/>`,
   generic:`<path d="M20 32H44"/><path d="M14 22V42M20 25V39M44 25V39M50 22V42" stroke-width="5"/>`};
-const EXPICS=[[/banca|bench|pecho plano/,'banca'],[/militar|hombro|arnold|overhead/,'militar'],[/fondo|dip/,'fondos'],[/triceps|frances|copa/,'triceps'],[/dominad|pull.?up|chin/,'dominadas'],[/remo|row/,'remo'],[/jalon|lat|polea/,'jalon'],[/curl|biceps/,'curl'],[/prensa|leg press/,'prensa'],[/sentadilla|squat|zancada|bulgara/,'sentadilla'],[/peso muerto|deadlift|rumano|hip thrust/,'muerto'],[/gemelo|calf|talon/,'gemelos'],[/plancha|plank|core|abdominal/,'plancha']];
+const EXPICS=[[/banca|bench|pecho plano/,'banca'],[/militar|hombro|arnold|overhead/,'militar'],[/fondo|dip/,'fondos'],[/triceps|frances|copa/,'triceps'],[/dominad|pull.?up|chin/,'dominadas'],[/remo|row/,'remo'],[/jalon|lat|polea/,'jalon'],[/curl|biceps/,'curl'],[/prensa|leg press/,'prensa'],[/sentadilla|squat|zancada|bulgara/,'sentadilla'],[/peso muerto|deadlift|rumano|hip thrust/,'muerto'],[/gemelo|calf|talon/,'gemelos'],[/plancha|plank|core|abdominal|crunch|elevacion de piernas|rueda/,'plancha']];
 const exPic=n=>{const s=nrm(n);const k=(EXPICS.find(([r])=>r.test(s))||[0,'generic'])[1];return `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${EXSVG[k]}</svg>`};
 function routineView(id){
   const r=find('routines',id);
@@ -381,7 +411,7 @@ function runView(){
   const five=cont.filter(r=>r.km>=5).map(r=>rSec(r)/r.km*5).sort((a,b)=>a-b)[0],longest=Math.max(0,...cont.map(r=>r.km));
   return painBanner()+`<section class="stats"><div class="stat"><span class="muted">Mejor 5K</span><b class="num">${five?fmtT(five):'—'}</b><span class="muted">${five?paceOf(five,5):'corre 5 km'}</span></div><div class="stat"><span class="muted">Hacia el 10K</span><b class="num">${Math.round(longest*10)/10} km</b><span class="muted">${longest>=10?'¡conseguido!':'tu tirada más larga'}</span></div><div class="stat"><span class="muted">Esta semana</span><b class="num">${Math.round(km*10)/10} km</b><span class="muted">de ${S.goals.km} km</span></div></section>
   <div style="display:flex;flex-direction:column;gap:10px">${Object.entries(RTYPES).map(([k,[t,d]])=>{const l=S.runs.filter(r=>rType(r)===k).sort((a,b)=>a.date>b.date?1:-1).at(-1);return `<button class="card" style="border:none;text-align:left;flex-direction:row;align-items:center;min-height:84px" data-act="openRun" data-v="${k}"><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px"><h2 style="font-size:21px">${t}</h2><span class="muted">${d}${l?' · última: '+fdate(l.date).toLowerCase():''}</span></div><span style="font-size:26px;color:var(--accent)" aria-hidden="true">›</span></button>`}).join('')}</div>
-  <div class="preview">En el iPhone podrás pasar una captura de Huawei Health y la sesión se apunta sola.</div>`;
+  `;
 }
 function runSuggest(k,h){const l=h.at(-1);
   if(!l)return k==='series'?'Empieza con 6×400 m a un ritmo que puedas mantener igual en todas, con 90 s de descanso.':k==='ritmo'?'Empieza con 3 km a un ritmo exigente pero sostenible, algo más lento que tu ritmo de 5K.':'Empieza con 5 km muy suaves: deberías poder hablar mientras corres.';
@@ -441,14 +471,15 @@ function vMolestias(){const act=S.pains.filter(p=>!p.resolved),old=S.pains.filte
   return head('Lesiones y dolores','Molestias',back())+banner()+addForm('pains','Apuntar molestia',[['zone','Zona','select',ZONES],['level','Dolor (1 a 10)','number',0,0,'required min="1" max="10" step="1" value="3"'],['since','Desde','date'],['note','Cuándo molesta','text',0,0,'placeholder="Ej.: al bajar escaleras"']])+`<section class="card"><h2>Activas</h2>${list(act,row,'Ninguna.')}</section>${old.length?`<section class="card"><h2>Recuperadas</h2>${list(old,row,'')}</section>`:''}<p class="muted">Si un dolor dura más de unos días o va a más, que lo vea un fisio o un médico.</p>`;
 }
 const favSection=()=>`<section class="card"><h2>Lo de siempre</h2>${S.mealFav.length?`<div class="row wrap">${S.mealFav.map(f=>`<span class="row" style="gap:0"><button class="chip" data-act="eatFav" data-id="${f.id}">+ ${esc(f.what)} · ${f.kcal} kcal</button>${delBtn('mealFav',f.id)}</span>`).join('')}</div><p class="muted">Toca una para apuntarla hoy.</p>`:'<p class="muted">Pulsa ☆ en una comida del registro para guardarla aquí y apuntarla en un toque.</p>'}</section>`;
-const EDITABLE=new Set(['ctests','tasks','moves','debts','gym','runs','meals','sleep','lessons','exams','events','bdays','wish','notes','alarms','sheets','students','routines','habits','pains','mealFav']);
+const EDITABLE=new Set(['pots','ctests','tasks','moves','debts','gym','runs','meals','sleep','lessons','exams','events','bdays','wish','notes','alarms','sheets','students','routines','habits','pains','mealFav']);
 function editFields(k,it){return({
   tasks:[['title','Qué','text'],['kind','Tipo','select',['Tarea','Cita','Trámite']],['must','Obligatoria','bool'],['date','Fecha','date'],['time','Hora','time']],
-  moves:[['concept','Concepto','text'],['type','Tipo','select',[['gasto','Gasto'],['ingreso','Ingreso']]],['amount','Importe (€)','number'],['cat','Categoría','select',CATS],['date','Fecha','date']],
+  moves:[['concept','Concepto','text'],['type','Tipo','select',[['gasto','Gasto'],['ingreso','Ingreso']]],['amount','Importe (€)','number'],['cat','Categoría','select',ALLCATS],['date','Fecha','date']],
   debts:[['concept','De qué','text'],['dir','Quién debe','select',[['meDeben','Me deben a mí'],['debo','Debo yo']]],['amount','Importe (€)','number'],['person','Persona','text'],['date','Fecha','date']],
   gym:[['ex','Ejercicio','text'],['kg','Peso (kg)','number'],['sets','Series','number'],['reps','Repeticiones','number'],['date','Fecha','date']],
   runs:it.type==='series'?[['reps','Series','number'],['dist','Metros por serie','number'],['repSec','Tiempo por serie (m:ss)','durs'],['rest','Descanso (s)','number'],['date','Fecha','date']]:[['km','Distancia (km)','number'],['sec','Tiempo total (mm:ss)','dur'],['hr','Pulso medio','number'],['date','Fecha','date']],
-  meals:[['what','Qué','text'],['when','Momento','select',['Desayuno','Media mañana','Comida','Merienda','Cena','Picoteo']],['kcal','Calorías','number'],['date','Fecha','date']],
+  meals:[['what','Qué','text'],['when','Momento','select',MOMENTS],['kcal','Calorías','number'],['p','Proteínas (g)','number'],['c','Hidratos (g)','number'],['f','Grasas (g)','number'],['date','Fecha','date']],
+  pots:[['name','Nombre','text'],['target','Objetivo (€)','number'],['saved','Ahorrado (€)','number']],
   sleep:[['bed','Me acosté','time'],['up','Me levanté','time'],['date','Fecha','date']],
   lessons:[['topic','Qué habéis dado','text'],['subject','Asignatura','text'],['date','Fecha','date'],['time','Hora','time']],
   exams:[['subject','Asignatura','text'],['date','Fecha','date'],['grade','Nota','text']],
@@ -458,7 +489,7 @@ function editFields(k,it){return({
   notes:[['text','Nota','area']],
   alarms:[['label','Nombre','text'],['time','Hora','time']],
   sheets:[['title','Título','text'],['body','Contenido','area']],
-  students:[['name','Nombre','text'],['price','Precio por clase (€)','number']],
+  students:[['name','Nombre','text'],['price','Precio por clase (€)','number'],['color','Color','select',SCOLS.map((c,i)=>[c,SCOLN[i]])]],
   routines:[['name','Nombre del día','text']],
   habits:[['name','Hábito','text']],
   pains:[['zone','Zona','select',ZONES],['level','Dolor (1 a 10)','number'],['since','Desde','date'],['note','Cuándo molesta','text']],
@@ -471,7 +502,7 @@ function editModal(){if(!editing)return'';const it=find(editing.k,editing.id);if
     else if(t==='bool')inp=`<select id="${idf}" name="${n}"><option value="1" ${v?'selected':''}>Sí</option><option value="0" ${v?'':'selected'}>No</option></select>`;
     else if(t==='area')inp=`<textarea id="${idf}" name="${n}">${esc(v)}</textarea>`;
     else if(t==='dur'||t==='durs')inp=`<input id="${idf}" name="${n}" type="text" value="${v?fmtT(v):''}">`;
-    else inp=`<input id="${idf}" name="${n}" type="${t}" ${t==='number'?'step="any" inputmode="decimal"':''} value="${esc(v??'')}">`;
+    else inp=`<input id="${idf}" name="${n}" type="${t==='number'?'text':t}" ${t==='number'?'inputmode="decimal" autocomplete="off"':''} value="${esc(String(v??'').replace(t==='number'?'.':'\u0000',','))}">`;
     return `<label class="lbl ${t==='area'||t==='text'?'wide':''}" for="${idf}">${l}${inp}</label>`}).join('')}</div><button class="btn" type="submit">Guardar cambios</button></form></div>`;
 }
 
@@ -480,7 +511,7 @@ let chat=[],lastUndo=null;
 const AI_HELP='No lo he pillado. Prueba con frases como «gasté 12 € en gasolina», «Pablo me debe 20 de la cena», «press banca 62,5 kg 4x10», «corrí 5 km en 27:30», «tengo que llamar al banco mañana a las 10», «borra la tarea del banco» o «qué tengo mañana».';
 const nrm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
 const numIn=s=>{const m=String(s||'').match(/(\d+(?:[.,]\d+)?)/);return m?parseFloat(m[1].replace(',','.')):null};
-const cap=s=>s?s.charAt(0).toUpperCase()+s.slice(1):'';
+const cap=s=>s?String(s).charAt(0).toUpperCase()+String(s).slice(1):'';
 const DOWS=['domingo','lunes','martes','miercoles','jueves','viernes','sabado'];
 function dateIn(t){
   if(/pasado manana/.test(t))return addDays(2);
@@ -586,7 +617,7 @@ function assistant(o){o=o.trim().replace(/[.!?¿¡]+/g,'').trim();const t=nrm(o)
 let aiBusy=false,aiOff=false;
 const appToken=()=>{try{return localStorage.getItem('av.token')||''}catch(e){return''}};
 async function callAI(prompt){const r=await fetch('/api/ai',{method:'POST',headers:{'content-type':'application/json','x-app-token':appToken()},body:JSON.stringify({prompt})});if(!r.ok){const e=new Error('http '+r.status);e.status=r.status;throw e}return r.json()}
-const SPEC={tasks:{title:'s',kind:'s',date:'d',time:'s',must:'b'},moves:{type:'s',amount:'n',concept:'s',cat:'s',date:'d'},debts:{dir:'s',person:'s',amount:'n',concept:'s',date:'d'},gym:{ex:'s',kg:'n',sets:'n',reps:'n',date:'d'},runs:{type:'s',km:'n',sec:'n',reps:'n',dist:'n',repSec:'n',rest:'n',hr:'n',date:'d'},meals:{when:'s',what:'s',kcal:'n',date:'d'},sleep:{bed:'s',up:'s',date:'d'},lessons:{sid:'s',subject:'s',topic:'s',date:'d',time:'s',paid:'b'},exams:{sid:'s',subject:'s',date:'d',grade:'s'},events:{who:'s',type:'s',date:'d',time:'s',where:'s',result:'s'},bdays:{name:'s',date:'d'},wish:{item:'s',price:'n'},notes:{text:'s'},habits:{name:'s'},pains:{zone:'s',level:'n',since:'d',note:'s'},alarms:{time:'s',label:'s'},students:{name:'s',price:'n'},ctests:{fails:'n',date:'d'}};
+const SPEC={tasks:{title:'s',kind:'s',date:'d',time:'s',must:'b'},moves:{type:'s',amount:'n',concept:'s',cat:'s',date:'d'},debts:{dir:'s',person:'s',amount:'n',concept:'s',date:'d'},gym:{ex:'s',kg:'n',sets:'n',reps:'n',date:'d'},runs:{type:'s',km:'n',sec:'n',reps:'n',dist:'n',repSec:'n',rest:'n',hr:'n',date:'d'},meals:{when:'s',what:'s',kcal:'n',p:'n',c:'n',f:'n',date:'d'},sleep:{bed:'s',up:'s',date:'d'},lessons:{sid:'s',subject:'s',topic:'s',date:'d',time:'s',paid:'b'},exams:{sid:'s',subject:'s',date:'d',grade:'s'},events:{who:'s',type:'s',date:'d',time:'s',where:'s',result:'s'},bdays:{name:'s',date:'d'},wish:{item:'s',price:'n'},notes:{text:'s'},habits:{name:'s'},pains:{zone:'s',level:'n',since:'d',note:'s'},alarms:{time:'s',label:'s'},students:{name:'s',price:'n'},ctests:{fails:'n',date:'d'}};
 const ADD_DEF={tasks:{done:false,kind:'Tarea',date:'',time:'',must:false},debts:{paid:false},wish:{done:false,price:0},pains:{resolved:''},alarms:{on:true},runs:{hr:0},events:{result:'',time:'',where:''},lessons:{paid:false,time:'',subject:''},exams:{grade:''},meals:{kcal:0}};
 const DATED=['ctests','moves','debts','gym','runs','meals','sleep','lessons','exams','events','notes','pains'];
 function coerce(col,obj,spec){const sp=spec||SPEC[col],out={};for(const k in sp){const v=obj[k];if(v===undefined||v===null)continue;const t=sp[k];
@@ -636,7 +667,7 @@ Acciones:
   debts {dir:"meDeben"|"debo", person, amount, concept, date}
   gym {ex, kg, sets, reps, date}  (usa el nombre exacto si el ejercicio ya existe en las rutinas)
   runs {type:"ritmo"|"larga", km, sec (segundos totales), date}  o  {type:"series", reps, dist (metros), repSec (segundos por serie), rest (segundos), date}
-  meals {when:"Desayuno"|"Media mañana"|"Comida"|"Merienda"|"Cena"|"Picoteo", what, kcal (estimación razonable), date}
+  meals {when:"Desayuno"|"Media mañana"|"Comida"|"Merienda"|"Cena"|"Picoteo", what, kcal, p (proteínas g), c (hidratos g), f (grasas g), date}  (estima calorías y macros de forma realista)
   sleep {bed:"HH:MM", up:"HH:MM", date (día en que se levantó)}
   lessons {sid (id de alumno), subject, topic, date, time, paid:boolean}
   exams {sid, subject, date, grade}
@@ -671,6 +702,42 @@ async function askAI(q){aiBusy=true;chat.push({me:q});render();showToast('Pensan
   if(reply==null)reply=localAssistant(q);
   const changed=JSON.stringify(S)!==before;if(changed)lastUndo=before;chat.push({ai:reply,undo:changed});aiBusy=false;save();render();showToast(reply.length>150?reply.slice(0,147)+'…':reply,4000)}
 
+/* ---------- COMIDAS: contador de calorías y macros con IA ---------- */
+const MOMENTS=['Desayuno','Media mañana','Comida','Merienda','Cena','Picoteo'];
+let foodDay=TODAY,foodDraft=null,foodBusy=false,moneyBusy=false;
+const momentNow=()=>{const h=new Date().getHours()+new Date().getMinutes()/60;return h<11?'Desayuno':h<13?'Media mañana':h<16.5?'Comida':h<19.5?'Merienda':'Cena'};
+const MAC=[['p','Proteínas','prot','#6EA8FF'],['c','Hidratos','carb','#F5C451'],['f','Grasas','fat','#FF8FC7']];
+async function shrinkImg(file){const url=URL.createObjectURL(file);try{const img=new Image();img.src=url;await img.decode();const k=Math.min(1,1024/Math.max(img.naturalWidth,img.naturalHeight)),cv=document.createElement('canvas');cv.width=Math.round(img.naturalWidth*k);cv.height=Math.round(img.naturalHeight*k);cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);return{mime:'image/jpeg',data:cv.toDataURL('image/jpeg',0.82).split(',')[1]}}finally{URL.revokeObjectURL(url)}}
+async function aiData(mode,prompt,file){const body={mode,prompt};if(file)body.image=await shrinkImg(file);const r=await fetch('/api/ai',{method:'POST',headers:{'content-type':'application/json','x-app-token':appToken()},body:JSON.stringify(body)});if(!r.ok)throw r.status;const d=await r.json();return d.data||{}}
+const aiErr=e=>e===401?'Revisa la clave de la app en Ajustes.':e===429?'La IA gratuita ha llegado a su límite por hoy.':e===503?'Falta poner la clave de Gemini en Vercel.':'No he podido analizarlo. Prueba otra vez o apúntalo a mano.';
+const foodPrompt=(text,img)=>`Eres un nutricionista que estima calorías y macronutrientes de comidas (cocina española habitual). ${img?'Analiza la foto adjunta.':''}${text?' Descripción del usuario: '+JSON.stringify(text)+'.':''}
+Identifica cada alimento, estima la cantidad en gramos con raciones realistas y calcula las calorías (kcal) y los gramos de proteínas (p), hidratos de carbono (c) y grasas (f). Los totales deben ser la suma de los alimentos.
+Responde SOLO con JSON: {"name":"nombre corto del plato","items":[{"name":"","g":0,"kcal":0,"p":0,"c":0,"f":0}],"kcal":0,"p":0,"c":0,"f":0,"note":"una frase breve solo si algo es dudoso"}. Si no hay comida, kcal 0 y explícalo en note.`;
+async function aiFood(text,file){foodBusy=true;render();try{const d=await aiData('food',foodPrompt(text,!!file),file);const n=x=>Math.max(0,Math.round(+x||0));
+  foodDraft={what:String(d.name||text||'Comida').slice(0,80),items:(Array.isArray(d.items)?d.items:[]).slice(0,12).map(i=>({name:String(i.name||'').slice(0,60),g:n(i.g),kcal:n(i.kcal)})),kcal:n(d.kcal),p:n(d.p),c:n(d.c),f:n(d.f),note:String(d.note||'').slice(0,200),when:foodDay===TODAY?momentNow():'Comida',date:foodDay}}
+  catch(e){showToast(aiErr(e),3800)}foodBusy=false;render()}
+async function aiTicket(file){moneyBusy=true;render();try{const d=await aiData('ticket',`Lee el ticket, recibo o factura de la foto. Responde SOLO con JSON: {"concept":"comercio o concepto breve","amount":importe total en euros (número),"cat":"una de: ${CATS.join(', ')}","date":"YYYY-MM-DD o vacío si no aparece"}. Hoy es ${TODAY}.`,file);
+  moneyDraft={concept:String(d.concept||'Ticket').slice(0,80),amount:Math.round((+d.amount||0)*100)/100,cat:CATS.includes(d.cat)?d.cat:'Otros',date:/^\d{4}-\d{2}-\d{2}$/.test(d.date||'')?d.date:TODAY}}catch(e){showToast(aiErr(e),3800)}moneyBusy=false;render()}
+function ring(val,goal,size){const r=46,C=2*Math.PI*r,pc=goal?Math.min(1,val/goal):0;return `<svg viewBox="0 0 110 110" width="${size}" height="${size}" aria-hidden="true"><circle cx="55" cy="55" r="${r}" fill="none" style="stroke:var(--card2)" stroke-width="10"/><circle cx="55" cy="55" r="${r}" fill="none" style="stroke:${val>goal?'var(--warn)':'var(--accent)'}" stroke-width="10" stroke-linecap="round" stroke-dasharray="${(C*pc).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 55 55)"/></svg>`}
+function foodView(){
+  const G=S.goals,day=S.meals.filter(m=>m.date===foodDay),T={kcal:sum(day,m=>+m.kcal||0),p:sum(day,m=>+m.p||0),c:sum(day,m=>+m.c||0),f:sum(day,m=>+m.f||0)},left=G.kcal-T.kcal;
+  const nav=`<div class="row between"><button class="icon" data-act="foodDay" data-v="-1" aria-label="Día anterior">‹</button><h2>${cap(fdate(foodDay))}</h2><button class="icon" data-act="foodDay" data-v="1" aria-label="Día siguiente" ${foodDay>=TODAY?'disabled':''}>›</button></div>`;
+  const macroRow=m=>`<span class="macros"><i style="color:#6EA8FF">P ${Math.round(+m.p||0)}</i><i style="color:#F5C451">H ${Math.round(+m.c||0)}</i><i style="color:#FF8FC7">G ${Math.round(+m.f||0)}</i></span>`;
+  return `<section class="card">${nav}<div class="row" style="gap:16px;align-items:center"><div class="ringbox">${ring(T.kcal,G.kcal,124)}<div class="ringtxt"><b class="num">${Math.abs(left)}</b><span>${left>=0?'kcal restantes':'kcal de más'}</span></div></div>
+     <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:9px">${MAC.map(([k,l,g,c])=>`<div style="display:flex;flex-direction:column;gap:4px"><div class="row between"><span style="font-size:13px;font-weight:700">${l}</span><span class="muted num" style="font-size:12px">${Math.round(T[k])} / ${G[g]} g</span></div><div class="bar"><i style="width:${Math.min(100,T[k]/G[g]*100)}%;background:${c}"></i></div></div>`).join('')}</div></div>
+     <div class="row between muted num" style="font-size:12px"><span>Comido ${T.kcal} kcal</span><span>Objetivo ${G.kcal} kcal</span></div></section>
+   <section class="card"><h2>Añadir con IA</h2><div class="grid2"><label class="btn filebtn" for="foodPic">${foodBusy?'Analizando…':'Foto del plato'}<input id="foodPic" class="vh" type="file" accept="image/*"></label><button class="btn ghost" data-act="foodFocus">Describirlo</button></div>
+    <form class="row" data-form="foodText"><input id="foodTxt" name="txt" placeholder="Ej.: 2 huevos fritos con pan y un café con leche" aria-label="Describe lo que has comido"><button class="btn small" type="submit" ${foodBusy?'disabled':''}>Calcular</button></form></section>
+   ${foodDraft?`<form class="card" data-form="foodDraft" style="border:1px solid var(--accent)"><div class="row between"><h2>Revisa y guarda</h2><b class="num">${foodDraft.kcal} kcal</b></div>
+     ${foodDraft.items.length?`<div>${foodDraft.items.map(i=>`<div class="row between" style="font-size:13px;padding:4px 0;border-bottom:1px solid var(--line)"><span>${esc(i.name)}${i.g?' · '+i.g+' g':''}</span><span class="muted num">${i.kcal} kcal</span></div>`).join('')}</div>`:''}
+     ${foodDraft.note?`<p class="muted">${esc(foodDraft.note)}</p>`:''}
+     <div class="grid2"><label class="lbl wide" for="fdW">Nombre<input id="fdW" name="what" value="${esc(foodDraft.what)}"></label><label class="lbl" for="fdM">Momento<select id="fdM" name="when">${MOMENTS.map(m=>`<option ${m===foodDraft.when?'selected':''}>${m}</option>`).join('')}</select></label><label class="lbl" for="fdK">Calorías<input id="fdK" name="kcal" type="number" inputmode="numeric" value="${foodDraft.kcal}"></label><label class="lbl" for="fdP">Proteínas (g)<input id="fdP" name="p" type="number" inputmode="numeric" value="${foodDraft.p}"></label><label class="lbl" for="fdC">Hidratos (g)<input id="fdC" name="c" type="number" inputmode="numeric" value="${foodDraft.c}"></label><label class="lbl wide" for="fdF">Grasas (g)<input id="fdF" name="f" type="number" inputmode="numeric" value="${foodDraft.f}"></label></div>
+     <div class="row"><button class="btn" style="flex:1" type="submit">Guardar</button><button type="button" class="btn ghost" data-act="foodCancel">Descartar</button></div><p class="muted" style="font-size:12px">Son estimaciones; ajusta las cantidades si sabes los gramos exactos.</p></form>`:''}
+   ${MOMENTS.map(mo=>{const ms=day.filter(m=>m.when===mo);if(!ms.length)return'';return `<section class="card"><div class="row between"><h2>${mo}</h2><span class="muted num">${sum(ms,m=>+m.kcal||0)} kcal</span></div>${ms.map(m=>`<div class="item"><div class="txt"><span class="t">${esc(m.what)}</span>${macroRow(m)}</div><span class="num amount">${m.kcal}</span><button class="del" data-act="favMeal" data-id="${m.id}" aria-label="Guardar en lo de siempre">☆</button>${delBtn('meals',m.id)}</div>`).join('')}</section>`}).join('')||(foodDraft?'':empty('Aún no has apuntado nada este día.'))}
+   ${favSection()}
+   ${addForm('meals','Apuntar a mano',[['when','Momento','select',MOMENTS],['kcal','Calorías','number',0,0,'min="0" step="1" value="0"'],['what','Qué has comido','text',0,1,REQ+' placeholder="Ej.: pasta con atún"'],['p','Proteínas (g)','number',0,0,'min="0" step="1"'],['c','Hidratos (g)','number',0,0,'min="0" step="1"'],['f','Grasas (g)','number',0,0,'min="0" step="1"'],['date','Fecha','date']])}`;
+}
+
 /* ---------- HOY ---------- */
 function viewHoy(){
   const w=S.water[TODAY]||0;
@@ -683,17 +750,17 @@ function viewHoy(){
   const kcal=sum(S.meals.filter(m=>m.date===TODAY),m=>m.kcal);
   const sl=S.sleep.find(s=>s.date===TODAY);
   const carnetDone=testsDone()>=TESTS_DAY;
+  const statsHoy=`<section class="stats" aria-label="Resumen">
+   <div class="stat"><span class="muted">Calorías</span><b class="num">${kcal}</b><span class="muted">de ${S.goals.kcal}</span></div>
+   <div class="stat"><span class="muted">Sueño</span><b class="num">${sl?hm((mins(sl.up)-mins(sl.bed)+1440)%1440).replace(' min','′'):'—'}</b><span class="muted">anoche</span></div>
+   <div class="stat"><span class="muted">Balance mes</span><b class="num">${bal>=0?'+':''}${eur(bal)}</b><span class="muted">${owed?'te deben '+eur(owed):'sin deudas'}</span></div></section>`;
   const hello=(h=>h<6?'Buenas noches':h<14?'Buenos días':h<21?'Buenas tardes':'Buenas noches')(new Date().getHours());
-  return head(new Date().toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'}),hello,`<button class="icon" data-act="go" data-v="ajustes" aria-label="Ajustes">${svg('ajustes')}</button>`)+banner()+backupNudge()+nextCard()+todayPlan()+
+  return head(new Date().toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'}),hello,`<button class="icon" data-act="go" data-v="ajustes" aria-label="Ajustes">${svg('ajustes')}</button>`)+banner()+statsHoy+nextCard()+todayPlan()+
   `${carnetDone?'':`<button class="card" style="border:none;text-align:left;flex-direction:row;align-items:center;background:var(--accent);color:var(--on-accent)" data-act="go" data-v="carnet">${svg('carnet')}<div style="flex:1;min-width:0"><b>Tests del carnet: ${testsDone()} de ${TESTS_DAY}</b><br><span style="font-size:13px">Racha de ${S.carnet.streak} días · tócalo para seguir</span></div><span style="font-size:24px" aria-hidden="true">›</span></button>`}
   ${due.length?`<section class="card"><h2>Atrasado</h2>${list(due,t=>`<div class="item"><button class="check" data-act="toggleTask" data-id="${t.id}" aria-label="Marcar como hecha"></button><div class="txt"><span class="t">${esc(t.title)}</span><span class="muted">${fdate(t.date)}</span></div>${t.must?'<span class="pill must">Obligatoria</span>':'<span class="pill late">Atrasada</span>'}</div>`,'')}</section>`:''}
   <section class="card"><div class="row between"><h2>Agenda de hoy</h2><button class="btn small ghost" data-act="tab" data-v="agenda">Calendario</button></div>${list(ev,evRow,'Nada más apuntado para hoy.')}</section>
 ${habitsHoy()}
-  <section class="card" aria-label="Agua" style="flex-direction:row;align-items:center"><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px"><div class="row between"><b>Agua</b><span class="muted num">${w} de ${S.goals.water} vasos</span></div><div class="bar"><i style="width:${Math.min(100,w/S.goals.water*100)}%;background:var(--info)"></i></div></div><button class="icon" data-act="water" data-v="-1" aria-label="Quitar un vaso">−</button><button class="icon" style="background:var(--info);color:var(--on-accent)" data-act="water" data-v="1" aria-label="Añadir un vaso">+</button></section>
-  <section class="stats" aria-label="Resumen">
-   <div class="stat"><span class="muted">Calorías</span><b class="num">${kcal}</b><span class="muted">de ${S.goals.kcal}</span></div>
-   <div class="stat"><span class="muted">Sueño</span><b class="num">${sl?hm((mins(sl.up)-mins(sl.bed)+1440)%1440).replace(' min','′'):'—'}</b><span class="muted">anoche</span></div>
-   <div class="stat"><span class="muted">Balance mes</span><b class="num">${bal>=0?'+':''}${eur(bal)}</b><span class="muted">${owed?'te deben '+eur(owed):'sin deudas'}</span></div></section>`;
+  <section class="card" aria-label="Agua" style="flex-direction:row;align-items:center"><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px"><div class="row between"><b>Agua</b><span class="muted num">${w} de ${S.goals.water} vasos</span></div><div class="bar"><i style="width:${Math.min(100,w/S.goals.water*100)}%;background:var(--info)"></i></div></div><button class="icon" data-act="water" data-v="-1" aria-label="Quitar un vaso">−</button><button class="icon" style="background:var(--info);color:var(--on-accent)" data-act="water" data-v="1" aria-label="Añadir un vaso">+</button></section>`;
 }
 
 /* ---------- AGENDA ---------- */
@@ -735,10 +802,7 @@ function viewCuerpo(){
   } else if(sub.cuerpo==='run'){
     body=runView();
   } else if(sub.cuerpo==='comidas'){
-    const td=S.meals.filter(m=>m.date===TODAY), k=sum(td,m=>m.kcal);
-    body=`<section class="card"><div class="row between"><h2>Hoy</h2><span class="num amount">${k} / ${S.goals.kcal} kcal</span></div><div class="bar"><i style="width:${Math.min(100,k/S.goals.kcal*100)}%"></i></div></section>`+
-     favSection()+addForm('meals','Apuntar comida',[['when','Momento','select',['Desayuno','Media mañana','Comida','Merienda','Cena','Picoteo']],['kcal','Calorías (aprox.)','number',0,0,'min="0" step="1" value="0"'],['what','Qué has comido','text',0,1,REQ+' placeholder="Ej.: pasta con atún"'],['date','Fecha','date',0,1]])+
-     `<section class="card"><h2>Registro</h2>${list(S.meals.slice().sort((a,b)=>a.date<b.date?1:-1),m=>`<div class="item"><div class="txt"><span class="t">${esc(m.what)}</span><span class="muted">${m.when} · ${fdate(m.date)}</span></div><span class="muted num">${m.kcal} kcal</span><button class="del" data-act="favMeal" data-id="${m.id}" aria-label="Guardar como habitual">☆</button>${delBtn('meals',m.id)}</div>`,'Aún no hay comidas.')}</section>`;
+    body=foodView();
   } else {
     const dur=s=>(mins(s.up)-mins(s.bed)+1440)%1440, last7=S.sleep.filter(s=>s.date>addDays(-7));
     body=`<section class="card"><div class="row between"><h2>Media 7 días</h2><span class="num amount">${last7.length?hm(sum(last7,dur)/last7.length):'—'}</span></div></section>`+
@@ -777,13 +841,15 @@ function personasBody(which){
 }
 
 /* ---------- CLASES ---------- */
+const SCOLS=['#F5C451','#6EA8FF','#A3E06B','#FF8A5B','#C9A2FF','#FF8FC7','#5FD3C6','#FFB86B'];
+const SCOLN=['Amarillo','Azul','Verde','Naranja','Morado','Rosa','Turquesa','Melocotón'];
+const stuCol=s=>s.color||SCOLS[Math.max(0,S.students.indexOf(s))%SCOLS.length];
 function viewClases(){
   if(selStu&&S.students.some(s=>s.id===selStu))return vAlumno(selStu);
-  const cards=S.students.map(s=>{const ls=S.lessons.filter(l=>l.sid===s.id),unpaid=ls.filter(l=>!l.paid&&l.date<=TODAY),nx=S.exams.filter(x=>x.sid===s.id&&x.date>=TODAY).sort((a,b)=>a.date>b.date?1:-1)[0],nf=S.sheets.filter(f=>f.sid===s.id).length;
+  const cards=S.students.map(s=>{const ls=S.lessons.filter(l=>l.sid===s.id),unpaid=ls.filter(l=>!l.paid&&l.date<=TODAY),nx=S.exams.filter(x=>x.sid===s.id&&x.date>=TODAY).sort((a,b)=>a.date>b.date?1:-1)[0];
     const subs=[...new Set([...ls.map(l=>l.subject),...S.exams.filter(x=>x.sid===s.id).map(x=>x.subject)].filter(Boolean))].map(esc).join(', ');
-    return `<button class="card" style="border:none;text-align:left" data-act="openStu" data-id="${s.id}"><div class="row between" style="width:100%"><div><h2>${esc(s.name)}</h2><span class="muted">${subs||'Sin asignaturas aún'}</span></div>${unpaid.length?`<span class="pill must">Debe ${eur(unpaid.length*s.price)}</span>`:'<span class="pill okp">Al día</span>'}</div>
-     <div class="row wrap"><span class="pill soft">${ls.length} clases</span><span class="pill soft">${nf} fichas</span>${nx?`<span class="pill soft">Examen ${fdate(nx.date)}</span>`:''}</div></button>`}).join('');
-  return head('Tus alumnos','Clases')+banner()+(cards||empty('Añade tu primer alumno.'))+addForm('students','Nuevo alumno',[['name','Nombre','text',0,0,REQ],['price','Precio por clase (€)','number',0,0,NUM]],'Añadir alumno');
+    return `<button class="folder" style="--fc:${stuCol(s)}" data-act="openStu" data-id="${s.id}"><span class="ftab"></span><span class="fbody"><span class="finit">${esc(s.name.trim().charAt(0).toUpperCase())}</span><b>${esc(s.name)}</b><span class="muted" style="font-size:12px">${subs||'Sin asignaturas aún'}</span><span class="fmeta">${ls.length} clase${ls.length===1?'':'s'}${unpaid.length?' · debe '+eur(unpaid.length*s.price):''}${nx?' · examen '+fdate(nx.date).toLowerCase():''}</span></span></button>`}).join('');
+  return head('Tus alumnos','Clases')+banner()+(cards?`<div class="folders">${cards}</div>`:empty('Añade tu primer alumno.'))+addForm('students','Nuevo alumno',[['name','Nombre','text',0,0,REQ],['price','Precio por clase (€)','number',0,0,NUM],['color','Color','select',SCOLS.map((c,i)=>[c,SCOLN[i]]),1]],'Añadir alumno');
 }
 function vAlumno(id){
   const s=stu(id),ls=S.lessons.filter(l=>l.sid===id).sort((a,b)=>a.date<b.date?1:-1),ex=S.exams.filter(x=>x.sid===id).sort((a,b)=>a.date<b.date?1:-1),fs=S.sheets.filter(f=>f.sid===id).sort((a,b)=>a.date<b.date?1:-1),unpaid=ls.filter(l=>!l.paid&&l.date<=TODAY);
@@ -791,7 +857,9 @@ function vAlumno(id){
   const xrow=x=>`<div class="item"><div class="txt"><span class="t">${esc(x.subject)}</span><span class="muted">${fdate(x.date)}${x.date>=TODAY?' · en '+daysTo(x.date)+' días':''}</span></div>${x.grade?`<span class="pill okp">${esc(x.grade)}</span>`:'<span class="pill soft">Sin nota</span>'}${delBtn('exams',x.id)}</div>`;
   const frow=f=>`<details class="item" style="display:block"><summary class="row" style="cursor:pointer;list-style:none"><div class="txt"><span class="t">${esc(f.title)}</span><span class="muted">${fdate(f.date)}${f.ai?' · creada por IA':''}</span></div>${delBtn('sheets',f.id)}</summary>
      <div style="display:flex;flex-direction:column;gap:10px;padding-top:10px"><div style="white-space:pre-line;background:var(--card2);border-radius:12px;padding:12px;line-height:1.5">${esc(f.body)}</div><div class="row"><button class="btn small" data-act="copySheet" data-id="${f.id}">Copiar ficha</button><span class="muted" id="cs_${f.id}" role="status"></span></div></div></details>`;
-  return head('Alumno',esc(s.name),`<button class="btn small ghost" data-act="openStu" data-id="">‹ Clases</button>`)+banner()+
+  const col=stuCol(s);
+  return `<div style="display:contents;--accent:${col}">`+head('Alumno',`<span style="color:${col}">${esc(s.name)}</span>`,`<button class="btn small ghost" data-act="openStu" data-id="">‹ Clases</button>`)+banner()+
+   `<div class="row wrap" aria-label="Color de la carpeta">${SCOLS.map((c,i)=>`<button class="swatch ${c===col?'on':''}" style="background:${c}" data-act="stuColor" data-id="${id}" data-v="${c}" aria-label="Color ${SCOLN[i]}"></button>`).join('')}</div>`+
    `<section class="stats"><div class="stat"><span class="muted">Precio</span><b class="num">${eur(s.price)}</b></div><div class="stat"><span class="muted">Clases</span><b class="num">${ls.length}</b></div><div class="stat"><span class="muted">Debe</span><b class="num ${unpaid.length?'neg':''}">${eur(unpaid.length*s.price)}</b></div></section>
    <section class="card"><h2>Pedir una ficha a la IA</h2><label class="lbl" for="aiSheet">Qué necesitas<input id="aiSheet" disabled placeholder="Ej.: 10 ejercicios de ecuaciones de 2º grado con soluciones"></label><div class="preview">En la versión final la IA crea la ficha, se guarda aquí y la descargas en PDF. Abajo tienes una de ejemplo.</div></section>
    <section class="card"><h2>Fichas</h2>${list(fs,frow,'Sin fichas todavía.')}</section>
@@ -801,7 +869,7 @@ function vAlumno(id){
    <section class="card"><h2>Clases</h2>${list(ls,lrow,'Sin clases todavía.')}<p class="muted">Toca el cuadro para marcar la clase como cobrada.</p></section>
    ${addForm('lessons','Apuntar clase',[['sid','','hidden',id],['topic','Qué habéis dado','text',0,1,REQ+' placeholder="Ej.: tema 4, funciones"'],['subject','Asignatura (opcional)','text',0,0,' '],['time','Hora','time',0,0,' '],['date','Fecha','date'],['paid','¿Cobrada?','select',[['0','No'],['1','Sí']]],['rep','Repetir','select',[['','No'],['week','Cada semana']]]])}
    <form class="card" data-form="stuNote"><input type="hidden" name="sid" value="${id}"><label class="lbl" for="stuNote">Notas sobre ${esc(s.name)}<textarea id="stuNote" name="note" placeholder="Ej.: le cuestan las fracciones, examen final en junio">${esc(s.note||'')}</textarea></label><button class="btn ghost" type="submit">Guardar notas</button></form>
-   <div class="row between"><span class="muted">Borrar alumno y todo su historial</span>${delBtn('students',id)}</div>`;
+   <div class="row between"><span class="muted">Borrar alumno y todo su historial</span>${delBtn('students',id)}</div></div>`;
 }
 
 /* ---------- MÁS ---------- */
@@ -811,14 +879,48 @@ function viewMas(){
   if(!v)return head('Todo lo demás','Más')+banner()+`<div class="tiles">${MAS.map(([k,t,d])=>`<button class="tile" ${k==='dinero'?'style="grid-column:1/-1"':''} data-act="go" data-v="${k}">${svg(k)}<div><b>${t}</b><br><span>${k==='dinero'?moneyLine():d}</span></div></button>`).join('')}</div>`;
   return ({dinero:vDinero,compras:vCompras,carnet:vCarnet,notas:vNotas,movil:vMovil,alarma:vAlarma,ia:vIA,ajustes:vAjustes,habitos:vHabitos,molestias:vMolestias,equipo:()=>head('Nacional y mis partidos','Equipo',back())+banner()+personasBody('equipo'),cumples:()=>head('Que no se te pase','Cumpleaños',back())+banner()+personasBody('cumples')})[v]();
 }
+let moneyMonth=TODAY.slice(0,7),qType='gasto',moneyDraft=null;
+const ymAdd=(ym,n)=>{const[y,m]=ym.split('-').map(Number),d=new Date(y,m-1+n,1);return d.getFullYear()+'-'+pad(d.getMonth()+1)};
+const ymName=ym=>{const[y,m]=ym.split('-').map(Number);return new Date(y,m-1,1).toLocaleDateString('es-ES',{month:'long',year:'numeric'})};
+const movesOf=ym=>S.moves.filter(m=>m.date.slice(0,7)===ym);
+const catDot=c=>`<span class="catdot" style="background:${catCol(c)}">${esc(String(c).charAt(0))}</span>`;
+function donut(parts,total){const C=2*Math.PI*38;let off=0;return `<svg viewBox="0 0 100 100" class="donut" role="img" aria-label="Gasto por categoría">${parts.map(([c,v])=>{const len=v/total*C,el=`<circle cx="50" cy="50" r="38" fill="none" style="stroke:${catCol(c)}" stroke-width="14" stroke-dasharray="${len.toFixed(2)} ${(C-len).toFixed(2)}" stroke-dashoffset="${(-off).toFixed(2)}" transform="rotate(-90 50 50)"/>`;off+=len;return el}).join('')}<text x="50" y="47" text-anchor="middle" font-size="8" style="fill:var(--muted)">Gastos</text><text x="50" y="59" text-anchor="middle" font-size="11" font-weight="800" style="fill:var(--fg)">${eur(total)}</text></svg>`}
 function vDinero(){
+  const ym=moneyMonth,cur=ym===TODAY.slice(0,7),mm=movesOf(ym),exp=mm.filter(m=>m.type==='gasto'),inc=mm.filter(m=>m.type==='ingreso'),te=sum(exp,m=>m.amount),ti=sum(inc,m=>m.amount),bal=ti-te;
+  const prevE=sum(movesOf(ymAdd(ym,-1)).filter(m=>m.type==='gasto'),m=>m.amount),diff=prevE?Math.round((te-prevE)/prevE*100):null;
+  const nav=`<div class="row between"><button class="icon" data-act="mMonth" data-v="-1" aria-label="Mes anterior">‹</button><h2>${cap(ymName(ym))}</h2><button class="icon" data-act="mMonth" data-v="1" aria-label="Mes siguiente" ${cur?'disabled':''}>›</button></div>`;
   let body='';
-  if(sub.dinero==='movs'){
-    const mm=S.moves.filter(m=>m.date.slice(0,7)===TODAY.slice(0,7)),exp=mm.filter(m=>m.type==='gasto'),tot=sum(exp,m=>m.amount),inc=sum(mm.filter(m=>m.type==='ingreso'),m=>m.amount);
-    const byCat=CATS.map(c=>[c,sum(exp.filter(m=>m.cat===c),m=>m.amount)]).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]);
-    body=addForm('moves','Apuntar gasto o ingreso',[['type','Tipo','select',[['gasto','Gasto'],['ingreso','Ingreso']]],['amount','Importe (€)','number',0,0,NUM+' placeholder="0,00"'],['concept','Concepto','text',0,1,REQ+' placeholder="Ej.: cuota del gimnasio"'],['cat','Categoría','select',CATS],['date','Fecha','date'],['rep','Repetir','select',[['','No'],['month','Cada mes']],1]])+
-     `<section class="card"><div class="row between"><h2>Este mes</h2><span class="muted num">+${eur(inc)} · −${eur(tot)}</span></div>${byCat.length?byCat.map(([c,v])=>`<div style="display:flex;flex-direction:column;gap:6px"><div class="row between"><span>${c}</span><span class="num amount">${eur(v)}</span></div><div class="bar"><i style="width:${Math.round(v/tot*100)}%"></i></div></div>`).join(''):empty('Sin gastos este mes.')}</section>
-     <section class="card"><h2>Historial</h2>${list(S.moves.slice().sort((a,b)=>a.date<b.date?1:-1),m=>`<div class="item"><div class="txt"><span class="t">${esc(m.concept)}</span><span class="muted">${m.cat} · ${fdate(m.date)}</span></div><span class="num amount ${m.type==='ingreso'?'pos':'neg'}">${m.type==='ingreso'?'+':'−'}${eur(m.amount)}</span>${delBtn('moves',m.id)}</div>`,'Aún no hay movimientos.')}</section>`;
+  if(sub.dinero==='resumen'){
+    const byCat=CATS.map(c=>[c,sum(exp.filter(m=>m.cat===c),m=>m.amount)]).concat([['Otros',sum(exp.filter(m=>!CATS.includes(m.cat)),m=>m.amount)]]).reduce((acc,[c,v])=>{const f=acc.find(x=>x[0]===c);if(f)f[1]+=v;else acc.push([c,v]);return acc},[]).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]);
+    const B=S.budgets,catB=CATS.filter(c=>+B[c]>0),totalB=+B._total||sum(catB,c=>+B[c]);
+    const lastDay=new Date(+ym.slice(0,4),+ym.slice(5,7),0).getDate(),daysLeft=lastDay-(+TODAY.slice(8))+1,perDay=totalB&&cur?(totalB-te)/daysLeft:null;
+    const fixed=S.recurring.filter(r=>r.kind==='moves'&&r.data.type==='gasto');
+    body=`<section class="card">${nav}<div style="display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0"><span class="muted">Balance del mes</span><b class="num" style="font-size:34px;${bal<0?'color:var(--warn)':''}">${bal>=0?'+':''}${eur(bal)}</b></div>
+      <div class="grid2"><div class="stat" style="background:var(--card2)"><span class="muted">Ingresos</span><b class="num pos">+${eur(ti)}</b></div><div class="stat" style="background:var(--card2)"><span class="muted">Gastos</span><b class="num neg">−${eur(te)}</b>${diff!=null?`<span class="muted">${diff>0?'+':''}${diff} % vs mes anterior</span>`:''}</div></div></section>
+     ${perDay!=null?`<section class="card" style="flex-direction:row;align-items:center;gap:14px"><div style="flex:1"><div class="eyebrow">Puedes gastar</div><b class="num" style="font-size:26px;${perDay<0?'color:var(--warn)':''}">${eur(Math.max(0,perDay))} / día</b><p class="muted">${perDay<0?'Te has pasado del presupuesto del mes en '+eur(-perDay*daysLeft)+'.':'Hasta fin de mes ('+daysLeft+' días) para cumplir tu presupuesto de '+eur(totalB)+'.'}</p></div></section>`:''}
+     <section class="card"><h2>¿En qué se va?</h2>${byCat.length?`<div class="donutwrap">${donut(byCat,te)}<div class="legend2">${byCat.map(([c,v])=>`<div class="row between"><span class="row" style="gap:8px">${catDot(c)}${esc(c)}</span><span class="num">${eur(v)} <span class="muted">${Math.round(v/te*100)} %</span></span></div>`).join('')}</div></div>`:empty('Sin gastos este mes.')}</section>
+     <section class="card"><div class="row between"><h2>Presupuestos</h2>${totalB?`<span class="muted num">${eur(te)} de ${eur(totalB)}</span>`:''}</div>
+      ${catB.length?catB.map(c=>{const sp=sum(exp.filter(m=>m.cat===c),m=>m.amount),lim=+B[c],pc=Math.round(sp/lim*100);return `<div style="display:flex;flex-direction:column;gap:6px"><div class="row between"><span class="row" style="gap:8px">${catDot(c)}${esc(c)}</span><span class="num ${pc>100?'neg':''}">${eur(sp)} / ${eur(lim)}</span></div><div class="bar"><i style="width:${Math.min(100,pc)}%;background:${pc>100?'var(--warn)':pc>80?'#FFB86B':'var(--ok)'}"></i></div>${pc>100?'<span class="neg" style="font-size:12px;font-weight:700">Te has pasado '+eur(sp-lim)+'</span>':''}</div>`}).join(''):'<p class="muted">Pon un límite por categoría y te aviso si te pasas.</p>'}
+      <details class="add" style="padding:0;background:transparent"><summary>Editar presupuestos</summary><form data-form="budgets"><div class="grid2"><label class="lbl wide" for="bg__total">Total del mes (opcional)<input id="bg__total" name="_total" type="text" inputmode="decimal" min="0" step="1" value="${+B._total||''}" placeholder="Si lo dejas vacío, suma las categorías"></label>${CATS.filter(c=>!['Deudas','Ahorro'].includes(c)).map(c=>`<label class="lbl" for="bg_${c}">${c}<input id="bg_${c}" name="${c}" type="text" inputmode="decimal" min="0" step="1" value="${+B[c]||''}"></label>`).join('')}</div><button class="btn" type="submit">Guardar presupuestos</button></form></details></section>
+     <section class="card"><div class="row between"><h2>Gastos fijos</h2><span class="muted num">${eur(sum(fixed,r=>+r.data.amount||0))}/mes</span></div>${list(fixed,r=>`<div class="item">${catDot(r.data.cat)}<div class="txt"><span class="t">${esc(r.data.concept)}</span><span class="muted">El día ${+r.from.slice(8)} de cada mes</span></div><span class="num amount neg">${eur(r.data.amount)}</span>${delBtn('recurring',r.id)}</div>`,'Cuando apuntes un gasto, elige «Repetir cada mes» y aparecerá aquí.')}</section>
+     <button class="btn ghost" data-act="csv">Exportar ${ymName(ym)} (CSV)</button>`;
+  } else if(sub.dinero==='movs'){
+    const days=[...new Set(mm.map(m=>m.date))].sort().reverse();
+    const qcats=qType==='gasto'?CATS.filter(c=>c!=='Deudas'):INCATS.filter(c=>c!=='Deudas');
+    body=`<form class="card" data-form="quickMove"><div class="seg"><button type="button" class="${qType==='gasto'?'on':''}" data-act="qType" data-v="gasto">Gasto</button><button type="button" class="${qType==='ingreso'?'on':''}" data-act="qType" data-v="ingreso">Ingreso</button></div>
+      <label class="lbl" for="qAmt">Importe<input id="qAmt" name="amount" class="bigamt" type="text" inputmode="decimal" min="0" step="0.01" placeholder="0,00 €"></label>
+      <label class="lbl" for="qCon">Concepto (opcional)<input id="qCon" name="concept" placeholder="Ej.: gasolina"></label>
+      <span class="muted">Toca la categoría para guardarlo:</span><div class="catgrid">${qcats.map(c=>`<button type="submit" name="cat" value="${esc(c)}" class="catbtn" style="--cc:${catCol(c)}">${catDot(c)}<span>${esc(c)}</span></button>`).join('')}</div></form>
+     ${moneyDraft?`<form class="card" data-form="moneyDraft" style="border:1px solid var(--accent)"><h2>Ticket leído</h2><div class="grid2"><label class="lbl wide" for="mdC">Concepto<input id="mdC" name="concept" value="${esc(moneyDraft.concept)}"></label><label class="lbl" for="mdA">Importe (€)<input id="mdA" name="amount" type="text" inputmode="decimal" step="0.01" value="${moneyDraft.amount}"></label><label class="lbl" for="mdK">Categoría<select id="mdK" name="cat">${CATS.map(c=>`<option ${c===moneyDraft.cat?'selected':''}>${c}</option>`).join('')}</select></label><label class="lbl wide" for="mdD">Fecha<input id="mdD" name="date" type="date" value="${moneyDraft.date||TODAY}"></label></div><div class="row"><button class="btn" style="flex:1" type="submit">Guardar gasto</button><button type="button" class="btn ghost" data-act="mdCancel">Descartar</button></div></form>`:''}
+     <label class="btn ghost filebtn" for="ticketPic">${moneyBusy?'Leyendo el ticket…':'Foto del ticket'}<input id="ticketPic" class="vh" type="file" accept="image/*"></label>
+     ${addForm('moves','Apuntar con más detalle',[['type','Tipo','select',[['gasto','Gasto'],['ingreso','Ingreso']]],['amount','Importe (€)','number',0,0,NUM+' placeholder="0,00"'],['concept','Concepto','text',0,1,REQ+' placeholder="Ej.: cuota del gimnasio"'],['cat','Categoría','select',ALLCATS],['date','Fecha','date'],['rep','Repetir','select',[['','No'],['month','Cada mes']],1]])}
+     <section class="card">${nav}${days.length?days.map(d=>{const dm=mm.filter(m=>m.date===d),net=sum(dm,m=>m.type==='ingreso'?m.amount:-m.amount);return `<div class="dayhead"><span>${fdate(d)}</span><span class="num ${net<0?'neg':'pos'}">${net>=0?'+':''}${eur(net)}</span></div>${dm.map(m=>`<div class="item">${catDot(m.cat)}<div class="txt"><span class="t">${esc(m.concept)}</span><span class="muted">${esc(m.cat)}</span></div><span class="num amount ${m.type==='ingreso'?'pos':'neg'}">${m.type==='ingreso'?'+':'−'}${eur(m.amount)}</span>${delBtn('moves',m.id)}</div>`).join('')}`}).join(''):empty('Sin movimientos este mes.')}</section>`;
+  } else if(sub.dinero==='huchas'){
+    const tot=sum(S.pots,x=>+x.saved||0);
+    body=`<section class="card" style="align-items:center;text-align:center"><span class="muted">Ahorrado en tus huchas</span><b class="num" style="font-size:32px">${eur(tot)}</b></section>
+     ${S.pots.map(x=>{const pc=x.target?Math.min(100,Math.round(x.saved/x.target*100)):0;return `<section class="card"><div class="row between"><h2>${esc(x.name)}</h2>${delBtn('pots',x.id)}</div><div class="row between"><b class="num" style="font-size:20px">${eur(x.saved)}</b><span class="muted num">${x.target?'de '+eur(x.target)+' · '+pc+' %':''}</span></div><div class="bar"><i style="width:${pc}%;background:var(--ok)"></i></div>${x.target&&x.saved<x.target?`<span class="muted">Te faltan ${eur(x.target-x.saved)}</span>`:x.target?'<span class="pos" style="font-weight:700">¡Objetivo conseguido!</span>':''}
+       <form class="row" data-form="potAdd"><input type="hidden" name="id" value="${x.id}"><input name="amount" type="text" inputmode="decimal" step="0.01" placeholder="Cantidad" aria-label="Cantidad para ${esc(x.name)}"><button class="btn small" type="submit" name="dir" value="1">Meter</button><button class="btn small ghost" type="submit" name="dir" value="-1">Sacar</button></form></section>`}).join('')}
+     ${addForm('pots','Nueva hucha',[['name','Para qué','text',0,1,REQ+' placeholder="Ej.: zapatillas, viaje, coche"'],['target','Objetivo (€)','number',0,1,NUM]],'Crear hucha',!S.pots.length)}`;
   } else {
     const open=S.debts.filter(d=>!d.paid).sort((a,b)=>a.date>b.date?1:-1),paid=S.debts.filter(d=>d.paid);
     const row=d=>{const days=daysTo(TODAY)-daysTo(d.date);return `<div class="item"><div class="txt"><span class="t">${esc(d.person)} · ${esc(d.concept)}</span><span class="muted">${fdate(d.date)}${!d.paid&&days>=7?` · hace ${days} días`:''}</span></div><span class="num amount ${d.dir==='meDeben'?'pos':'neg'}">${eur(d.amount)}</span>${d.paid?'':`<button class="btn small" data-act="payDebt" data-id="${d.id}">Pagado</button>`}${delBtn('debts',d.id)}</div>`};
@@ -829,7 +931,7 @@ function vDinero(){
      <section class="card"><div class="row between"><h2>Debo</h2><span class="num amount neg">${eur(sum(yo,d=>d.amount))}</span></div>${list(yo,row,'No debes nada.')}</section>
      ${paid.length?`<section class="card"><h2>Saldadas</h2>${list(paid,row,'')}</section>`:''}`;
   }
-  return head('Finanzas','Dinero',back())+banner()+seg('dinero',[['movs','Movimientos'],['deudas','Deudas']])+body;
+  return head('Finanzas','Dinero',back())+banner()+seg('dinero',[['resumen','Resumen'],['movs','Movimientos'],['huchas','Huchas'],['deudas','Deudas']])+body;
 }
 function vCompras(){
   const open=S.wish.filter(w=>!w.done),got=S.wish.filter(w=>w.done);
@@ -894,7 +996,7 @@ function vAjustes(){
    `<form class="card" data-form="goals"><h2>Metas</h2><div class="grid2">
      <label class="lbl" for="g_water">Vasos de agua al día<input id="g_water" name="water" type="number" min="1" step="1" value="${S.goals.water}"></label>
      <label class="lbl" for="g_kcal">Calorías al día<input id="g_kcal" name="kcal" type="number" min="0" step="50" value="${S.goals.kcal}"></label>
-     <label class="lbl wide" for="g_km">Km de running por semana<input id="g_km" name="km" type="number" min="0" step="1" value="${S.goals.km}"></label></div>
+     <label class="lbl" for="g_km">Km de running por semana<input id="g_km" name="km" type="number" min="0" step="1" value="${S.goals.km}"></label><label class="lbl" for="g_p">Proteínas (g/día)<input id="g_p" name="prot" type="number" min="0" step="5" value="${S.goals.prot}"></label><label class="lbl" for="g_c">Hidratos (g/día)<input id="g_c" name="carb" type="number" min="0" step="5" value="${S.goals.carb}"></label><label class="lbl wide" for="g_f">Grasas (g/día)<input id="g_f" name="fat" type="number" min="0" step="5" value="${S.goals.fat}"></label></div>
      <button class="btn" type="submit">Guardar metas</button><span class="muted" id="goalsMsg" role="status"></span></form>
    ${planForm()}${recurringSection()}
    <section class="card"><div class="row between"><div><h2>Bloqueo con huella</h2><p class="muted">Pide huella o PIN al abrir la app.</p></div><span class="pill soft">Próximamente</span></div></section>
@@ -931,10 +1033,16 @@ document.addEventListener('click',e=>{
   else if(a==='quick')quick=!quick;
   else if(a==='q'){if(v==='water'){S.water[TODAY]=(S.water[TODAY]||0)+1;save();render();showToast('Vaso apuntado · '+S.water[TODAY]+' de '+S.goals.water);return}
     const go={move:()=>{tab='mas';sub.mas='dinero';sub.dinero='movs';openForm='moves'},debt:()=>{tab='mas';sub.mas='dinero';sub.dinero='deudas';openForm='debts'},gym:()=>{tab='cuerpo';sub.cuerpo='gym';openForm='gym'},task:()=>{tab='agenda';sub.agenda='tareas';openForm='tasks'},note:()=>{tab='mas';sub.mas='notas'}}[v];if(go)go();focusForm=true;quiz=null;window.scrollTo(0,0)}
-  else if(a==='bkFile'){const name='agenda-vital-'+TODAY+'.json',blob=new Blob([JSON.stringify(S)],{type:'application/json'});S.lastBackup=TODAY;save();
-    let file=null;try{file=new File([blob],name,{type:'application/json'})}catch(err){}
-    if(file&&navigator.canShare&&navigator.canShare({files:[file]}))navigator.share({files:[file],title:name}).catch(()=>{});
-    else{const u=URL.createObjectURL(blob),x=document.createElement('a');x.href=u;x.download=name;document.body.appendChild(x);x.click();x.remove();setTimeout(()=>URL.revokeObjectURL(u),2000)}render();return}
+  else if(a==='bkFile'){S.lastBackup=TODAY;save();shareFile('agenda-vital-'+TODAY+'.json','application/json',JSON.stringify(S));render();return}
+  else if(a==='stuColor'){const st=find('students',id);if(st)st.color=v}
+  else if(a==='foodDay'){const n=addDays(+v,foodDay);foodDay=n>TODAY?TODAY:n}
+  else if(a==='foodCancel')foodDraft=null;
+  else if(a==='foodFocus'){const el=document.getElementById('foodTxt');if(el)el.focus();return}
+  else if(a==='mMonth'){const n=ymAdd(moneyMonth,+v);if(n<=TODAY.slice(0,7))moneyMonth=n}
+  else if(a==='qType')qType=v;
+  else if(a==='mdCancel')moneyDraft=null;
+  else if(a==='csv'){const rows=[['Fecha','Tipo','Concepto','Categoría','Importe'],...movesOf(moneyMonth).sort((x,y)=>x.date>y.date?1:-1).map(m=>[m.date,m.type,m.concept,m.cat,(m.type==='gasto'?-m.amount:m.amount).toFixed(2).replace('.',',')])];
+    shareFile('movimientos-'+moneyMonth+'.csv','text/csv','﻿'+rows.map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(';')).join('\n'));return}
   else if(a==='ctStep'){const el=document.getElementById('ctFails');if(el)el.value=Math.max(0,Math.min(TEST_N,(+el.value||0)+(+v)));return}
   else if(a==='undo'){if(lastUndo){S=JSON.parse(lastUndo);lastUndo=null;chat.push({ai:'Deshecho.'})}}
   else if(a==='aiEx'){const el=document.getElementById('aiIn');if(el){el.value=v;el.focus()}return}
@@ -942,8 +1050,8 @@ document.addEventListener('click',e=>{
   else if(a==='closeEdit')editing=null;
   else if(a==='habit'){const l=S.habitLog[TODAY]=S.habitLog[TODAY]||[],i=l.indexOf(id);if(i<0)l.push(id);else l.splice(i,1)}
   else if(a==='painOk'){const p=find('pains',id);if(p)p.resolved=TODAY}
-  else if(a==='favMeal'){const m=find('meals',id);if(m&&!S.mealFav.some(f=>f.what===m.what))S.mealFav.push({id:uid(),when:m.when,what:m.what,kcal:m.kcal});save();render();showToast('Guardada en «Lo de siempre»');return}
-  else if(a==='eatFav'){const f=find('mealFav',id);if(f)S.meals.push({id:uid(),when:f.when,what:f.what,kcal:f.kcal,date:TODAY});save();render();if(f)showToast('Apuntado: '+f.what);return}
+  else if(a==='favMeal'){const m=find('meals',id);if(m&&!S.mealFav.some(f=>f.what===m.what))S.mealFav.push({id:uid(),when:m.when,what:m.what,kcal:m.kcal,p:m.p||0,c:m.c||0,f:m.f||0});save();render();showToast('Guardada en «Lo de siempre»');return}
+  else if(a==='eatFav'){const f=find('mealFav',id);if(f)S.meals.push({id:uid(),when:momentNow(),what:f.what,kcal:f.kcal,p:f.p||0,c:f.c||0,f:f.f||0,date:sub.cuerpo==='comidas'?foodDay:TODAY});save();render();if(f)showToast('Apuntado: '+f.what);return}
   else if(a==='goRt'){tab='cuerpo';sub.cuerpo='gym';selRt=id;selEx=null;window.scrollTo(0,0)}
   else if(a==='goRun'){tab='cuerpo';sub.cuerpo='run';selRun=v;window.scrollTo(0,0)}
   else if(a==='openRun'){selRun=v||null;window.scrollTo(0,0)}
@@ -977,9 +1085,10 @@ const BUILD={
   debts:f=>({dir:f.dir,person:f.person.trim(),amount:+f.amount,concept:f.concept.trim(),date:f.date||TODAY,paid:false}),
   gym:f=>({ex:f.ex.trim(),kg:+f.kg,sets:+f.sets,reps:+f.reps,date:f.date||TODAY}),
   runs:f=>{if(f.type==='series'){const repSec=toSec(f.repT),dist=+f.dist,reps=+f.reps;return{type:'series',reps,dist,repSec,rest:+f.rest||0,km:Math.round(reps*dist/100)/10,sec:repSec*reps,date:f.date||TODAY}}return{type:f.type,km:+f.km,sec:toSec(f.t,true),hr:+f.hr||0,date:f.date||TODAY}},
-  meals:f=>({when:f.when,what:f.what.trim(),kcal:+f.kcal||0,date:f.date||TODAY}),
+  meals:f=>({when:f.when,what:f.what.trim(),kcal:+f.kcal||0,p:+f.p||0,c:+f.c||0,f:+f.f||0,date:f.date||TODAY}),
+  pots:f=>({name:f.name.trim(),target:+f.target||0,saved:0}),
   sleep:f=>({bed:f.bed,up:f.up,date:f.date||TODAY}),
-  students:f=>({name:f.name.trim(),price:+f.price}),
+  students:f=>({name:f.name.trim(),price:+f.price,color:f.color||SCOLS[S.students.length%SCOLS.length]}),
   lessons:f=>({sid:f.sid,subject:(f.subject||'').trim(),topic:f.topic.trim(),date:f.date||TODAY,time:f.time||'',paid:f.paid==='1'}),
   exams:f=>({sid:f.sid,subject:f.subject.trim(),date:f.date||TODAY,grade:(f.grade||'').trim()}),
   events:f=>({who:f.who,type:f.who==='Yo'?'Partido':f.type,date:f.date||TODAY,time:f.time||'',where:f.where.trim(),result:(f.result||'').trim()}),
@@ -993,8 +1102,14 @@ const BUILD={
   alarms:f=>({time:f.time,label:(f.label||'').trim(),on:true})
 };
 document.addEventListener('submit',e=>{
-  e.preventDefault();const f=e.target,fd=Object.fromEntries(new FormData(f)),k=f.dataset.form;
+  e.preventDefault();const f=e.target,fd=Object.fromEntries(new FormData(f)),k=f.dataset.form;if(e.submitter&&e.submitter.name)fd[e.submitter.name]=e.submitter.value;for(const q in fd)if(typeof fd[q]==='string'&&/^\s*-?\d+,\d+\s*$/.test(fd[q]))fd[q]=fd[q].trim().replace(',','.');
   if(k==='ai'){const q=(fd.q||'').trim();if(!q||aiBusy)return;askAI(q);return}
+  if(k==='foodText'){const t=(fd.txt||'').trim();if(t&&!foodBusy)aiFood(t);return}
+  if(k==='foodDraft'){S.meals.push({id:uid(),when:fd.when,what:(fd.what||'Comida').trim(),kcal:+fd.kcal||0,p:+fd.p||0,c:+fd.c||0,f:+fd.f||0,date:foodDraft?foodDraft.date:foodDay});foodDraft=null;save();render();showToast('Comida guardada');return}
+  if(k==='quickMove'){const amt=parseFloat(String(fd.amount||'').replace(',','.'));if(!(amt>0)){showToast('Escribe primero el importe');return}const cat=fd.cat||'Otros';S.moves.push({id:uid(),type:qType,amount:Math.round(amt*100)/100,concept:(fd.concept||'').trim()||cat,cat,date:TODAY});S.example=false;save();render();showToast((qType==='gasto'?'Gasto':'Ingreso')+' de '+eur(amt)+' en '+cat);return}
+  if(k==='moneyDraft'){const amt=parseFloat(String(fd.amount||'').replace(',','.'));if(amt>0){S.moves.push({id:uid(),type:'gasto',amount:Math.round(amt*100)/100,concept:(fd.concept||'Ticket').trim(),cat:fd.cat||'Otros',date:fd.date||TODAY});showToast('Gasto guardado')}moneyDraft=null;save();render();return}
+  if(k==='budgets'){const b={};for(const[key,val]of Object.entries(fd))if(+val>0)b[key]=+val;S.budgets=b;save();render();showToast('Presupuestos guardados');return}
+  if(k==='potAdd'){const x=find('pots',fd.id),amt=parseFloat(String(fd.amount||'').replace(',','.'));if(x&&amt>0){x.saved=Math.max(0,Math.round(((+x.saved||0)+amt*(+fd.dir||1))*100)/100);save();render();showToast(fd.dir==='-1'?'Sacado de la hucha':'Metido en la hucha')}return}
   if(k==='token'){try{localStorage.setItem('av.token',(fd.tok||'').trim())}catch(e){}aiOff=false;showToast('Clave guardada');return}
   if(k==='ctest'){addCTest(fd.fails);save();render();showToast(`Test apuntado · ${testsDone()} de ${TESTS_DAY} hoy`);return}
   if(k==='editItem'){const it=editing&&find(editing.k,editing.id);if(it){const old=it.name;
@@ -1003,17 +1118,21 @@ document.addEventListener('submit',e=>{
     if(editing.k==='routines'&&old!==it.name)S.plan=S.plan.map(c=>c==='rt:'+old?'rt:'+it.name:c)}
     editing=null;save();render();showToast('Cambios guardados');return}
   if(k==='plan'){S.plan=[0,1,2,3,4,5,6].map(d=>fd['d'+d]||'');save();render();showToast('Plan guardado');return}
-  if(k==='goals'){S.goals={water:+fd.water||8,kcal:+fd.kcal||0,km:+fd.km||0};save();render();const m=document.getElementById('goalsMsg');if(m)m.textContent='Metas guardadas.';return}
+  if(k==='goals'){S.goals={water:+fd.water||8,kcal:+fd.kcal||0,km:+fd.km||0,prot:+fd.prot||0,carb:+fd.carb||0,fat:+fd.fat||0};save();render();const m=document.getElementById('goalsMsg');if(m)m.textContent='Metas guardadas.';return}
   if(k==='runs'&&!(BUILD.runs(fd).sec>0)){showToast('Escribe el tiempo así: 28:30');return}
   if(k==='addEx'){const r=S.routines.find(x=>x.id===fd.rid);if(r&&fd.ex.trim())r.exs.push(fd.ex.trim());save();render();showToast('Ejercicio añadido');return}
   if(k==='stuNote'){const s=S.students.find(x=>x.id===fd.sid);if(s)s.note=fd.note;save();render();return}
-  if(S.example){if(['lessons','exams','sheets','gym','runs'].includes(k))S.example=false;else clearExample()}
+  if(S.example){if(['lessons','exams','sheets','gym','runs','meals','pots','moves'].includes(k))S.example=false;else clearExample()}
   if(BUILD[k]){const item={id:uid(),...BUILD[k](fd)};S[k].push(item);if(fd.rep){const data=BUILD[k](fd);delete data.date;if(k==='lessons')data.paid=false;S.recurring.push({id:uid(),kind:k,freq:fd.rep,from:item.date,data});materialize()}if(k==='lessons'&&item.paid){const s=stu(item.sid);S.moves.push({id:uid(),lid:item.id,type:'ingreso',amount:s.price,concept:'Clase '+s.name,cat:'Clases',date:item.date})}}
   save();render();showToast(fd.rep?'Guardado. Se repetirá solo.':'Guardado');
 });
 document.addEventListener('input',e=>{const r=e.target.dataset.row;if(r!=null&&session)session.rows[+r][e.target.dataset.f]=e.target.value});
 document.addEventListener('gesturestart',e=>e.preventDefault());
 document.addEventListener('change',e=>{if(e.target.id!=='bkUp'||!e.target.files[0])return;const rd=new FileReader();rd.onload=()=>{const m=document.getElementById('bkUpMsg');try{const d=JSON.parse(rd.result);if(!d.tasks||!d.moves)throw 0;S={...EMPTY(),...d};save();render();showToast('Datos restaurados')}catch(err){if(m)m.textContent='Ese archivo no es una copia válida de Agenda Vital.'}};rd.readAsText(e.target.files[0])});
+function shareFile(name,type,content){const blob=new Blob([content],{type});let file=null;try{file=new File([blob],name,{type})}catch(err){}
+  if(file&&navigator.canShare&&navigator.canShare({files:[file]}))navigator.share({files:[file],title:name}).catch(()=>{});
+  else{const u=URL.createObjectURL(blob),x=document.createElement('a');x.href=u;x.download=name;document.body.appendChild(x);x.click();x.remove();setTimeout(()=>URL.revokeObjectURL(u),2000)}}
+document.addEventListener('change',e=>{const f=e.target.files&&e.target.files[0];if(!f)return;if(e.target.id==='foodPic'){e.target.value='';aiFood('',f)}else if(e.target.id==='ticketPic'){e.target.value='';aiTicket(f)}});
 function backupNudge(){if(S.example)return'';const d=S.lastBackup?-daysTo(S.lastBackup):999;return d>=7?`<div class="banner"><span class="muted">${S.lastBackup?'Hace '+d+' días de tu última copia.':'Aún no has hecho ninguna copia de tus datos.'}</span><button class="btn small ghost" data-act="go" data-v="ajustes">Hacer copia</button></div>`:''}
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));
 try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}

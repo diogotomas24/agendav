@@ -31,5 +31,5 @@ Es una web app instalable: se abre a pantalla completa como una app normal y fun
 ## Pendiente
 
 - Avisos (notificaciones) con Upstash QStash.
-- Leer capturas (sueño de Huawei Health, carreras, tickets, tiempo de uso) con Gemini.
+- Leer capturas de sueño (Huawei Health), carreras y tiempo de uso con Gemini (fotos de comida y tickets ya funcionan).
 - Bloqueo con Face ID.
