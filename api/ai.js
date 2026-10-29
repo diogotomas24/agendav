@@ -1,54 +1,39 @@
-// Asistente de Agenda Vital: recibe el texto (y, si hay, una foto) preparado por la app y se lo pasa a Gemini.
-// Modos: 'assistant' (apunta cosas), 'food' (calorías y macros de un plato), 'ticket' (lee un ticket).
-// Variables de entorno en Vercel:
-//   GEMINI_API_KEY  (obligatoria)  clave gratuita de Google AI Studio
-//   APP_TOKEN       (recomendada)  una contraseña tuya; la app la envía para que nadie más use tu cupo
-//   GEMINI_MODEL    (opcional)     por defecto "gemini-flash-latest"
+// Asistente de Agenda Vital con Gemini.
+// Modos: 'assistant' (apunta cosas), 'food' (calorías y macros), 'ticket' (lee un ticket),
+//        'weekly' (resumen de la semana), 'shop' (busca opciones de compra en Google).
+import { readBody, checkToken, gemini, parseJSON, shopPrompt } from '../lib/shared.js';
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'method_not_allowed' });
+  if (!checkToken(req, res)) return;
+  const body = readBody(req);
+  const mode = ['food', 'ticket', 'weekly', 'shop'].includes(body.mode) ? body.mode : 'assistant';
 
-  const key = process.env.GEMINI_API_KEY;
-  if (!key) return res.status(503).json({ error: 'missing_gemini_key' });
-
-  const token = process.env.APP_TOKEN;
-  if (token && req.headers['x-app-token'] !== token) return res.status(401).json({ error: 'bad_app_token' });
-
-  let body = req.body || {};
-  if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = {}; } }
-  const prompt = String(body.prompt || '').slice(0, 60000);
-  if (!prompt) return res.status(400).json({ error: 'empty_prompt' });
-  const mode = ['food', 'ticket'].includes(body.mode) ? body.mode : 'assistant';
-  const parts = [{ text: prompt }];
-  const img = body.image;
-  if (img && typeof img.data === 'string' && /^image\/(jpeg|png|webp|heic)$/.test(img.mime || '') && img.data.length < 4_000_000) {
-    parts.push({ inline_data: { mime_type: img.mime, data: img.data } });
+  let parts;
+  if (mode === 'shop') {
+    const it = body.item || {};
+    if (!it.name) return res.status(400).json({ error: 'empty_item' });
+    parts = [{ text: shopPrompt(String(it.name).slice(0, 200), +it.max || 0, String(it.pref || '').slice(0, 300)) }];
+  } else {
+    const prompt = String(body.prompt || '').slice(0, 60000);
+    if (!prompt) return res.status(400).json({ error: 'empty_prompt' });
+    parts = [{ text: prompt }];
+    const img = body.image;
+    if (img && typeof img.data === 'string' && /^image\/(jpeg|png|webp|heic)$/.test(img.mime || '') && img.data.length < 4_000_000) {
+      parts.push({ inline_data: { mime_type: img.mime, data: img.data } });
+    }
   }
 
-  const model = process.env.GEMINI_MODEL || 'gemini-flash-latest';
-  let r;
+  let out;
   try {
-    r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json', 'x-goog-api-key': key },
-      body: JSON.stringify({
-        contents: [{ role: 'user', parts }],
-        generationConfig: { responseMimeType: 'application/json', temperature: 0.2 }
-      })
-    });
-  } catch {
-    return res.status(502).json({ error: 'gemini_unreachable' });
+    const r = await gemini(parts, { search: mode === 'shop' });
+    const data = parseJSON(r.text);
+    if (!data || typeof data !== 'object') return res.status(502).json({ error: 'bad_json' });
+    if (mode === 'shop') data.sources = r.sources;
+    out = data;
+  } catch (e) {
+    return res.status(e.code === 429 ? 429 : e.code === 503 ? 503 : 502).json({ error: e.message.slice(0, 200) });
   }
-  if (r.status === 429) return res.status(429).json({ error: 'gemini_quota' });
-  if (!r.ok) return res.status(502).json({ error: 'gemini_error', status: r.status, detail: (await r.text()).slice(0, 400) });
-
-  const data = await r.json();
-  const text = (data?.candidates?.[0]?.content?.parts || []).map(p => p.text || '').join('');
-  let out = null;
-  try { out = JSON.parse(text); } catch {
-    const m = text.match(/\{[\s\S]*\}/);
-    try { out = m ? JSON.parse(m[0]) : null; } catch { out = null; }
-  }
-  if (!out || typeof out !== 'object') return res.status(502).json({ error: 'bad_json' });
   if (mode !== 'assistant') return res.status(200).json({ data: out });
   return res.status(200).json({ reply: String(out.reply || ''), actions: Array.isArray(out.actions) ? out.actions : [] });
 }

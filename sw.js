@@ -1,5 +1,5 @@
 // Agenda Vital · funciona sin conexión. Sube la versión al cambiar los archivos estáticos.
-const CACHE = 'av-v4';
+const CACHE = 'av-v5';
 const ASSETS = ['/', '/index.html', '/manifest.webmanifest', '/icon-192.png', '/icon-512.png', '/apple-touch-icon.png'];
 
 self.addEventListener('install', e => {
@@ -29,4 +29,22 @@ self.addEventListener('fetch', e => {
     }
     return r;
   })));
+});
+
+// Avisos
+self.addEventListener('push', e => {
+  let d = {};
+  try { d = e.data ? e.data.json() : {}; } catch { d = { body: e.data ? e.data.text() : '' }; }
+  e.waitUntil(self.registration.showNotification(d.title || 'Agenda Vital', {
+    body: d.body || '', icon: '/icon-192.png', badge: '/icon-192.png', tag: d.tag || undefined, data: { url: d.url || '/' }
+  }));
+});
+
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  const url = (e.notification.data && e.notification.data.url) || '/';
+  e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(cs => {
+    for (const c of cs) { if ('focus' in c) { if (c.navigate) c.navigate(url); return c.focus(); } }
+    return self.clients.openWindow(url);
+  }));
 });
