@@ -642,7 +642,7 @@ function assistant(o){o=o.trim().replace(/[.!?¿¡]+/g,'').trim();const t=nrm(o)
 /* ---------- IA de verdad: Claude interpreta el mensaje y devuelve acciones ---------- */
 let aiBusy=false,aiOff=false;
 const appToken=()=>{try{return localStorage.getItem('av.token')||''}catch(e){return''}};const gKey=()=>{try{return localStorage.getItem('av.gkey')||''}catch(e){return''}};const aiHdr=()=>({'content-type':'application/json','x-app-token':appToken(),'x-gemini-key':gKey()});
-async function callAI(prompt){const r=await fetch('/api/ai',{method:'POST',headers:aiHdr(),body:JSON.stringify({prompt})});if(!r.ok){const e=new Error('http '+r.status);e.status=r.status;throw e}return r.json()}
+async function callAI(prompt){const r=await fetch('/api/ai',{method:'POST',headers:aiHdr(),body:JSON.stringify({prompt})});if(!r.ok){let d={};try{d=await r.json()}catch(x){}const e=new Error(d.error||('http '+r.status));e.status=r.status;throw e}return r.json()}
 const SPEC={tasks:{title:'s',kind:'s',date:'d',time:'s',must:'b'},moves:{type:'s',amount:'n',concept:'s',cat:'s',date:'d'},debts:{dir:'s',person:'s',amount:'n',concept:'s',date:'d'},gym:{ex:'s',kg:'n',sets:'n',reps:'n',date:'d'},runs:{type:'s',km:'n',sec:'n',reps:'n',dist:'n',repSec:'n',rest:'n',hr:'n',date:'d'},meals:{when:'s',what:'s',kcal:'n',p:'n',c:'n',f:'n',date:'d'},sleep:{bed:'s',up:'s',date:'d'},lessons:{sid:'s',subject:'s',topic:'s',date:'d',time:'s',paid:'b'},exams:{sid:'s',subject:'s',date:'d',grade:'s'},events:{who:'s',type:'s',date:'d',time:'s',where:'s',result:'s'},bdays:{name:'s',date:'d'},wish:{item:'s',price:'n',pref:'s'},notes:{text:'s'},habits:{name:'s'},pains:{zone:'s',level:'n',since:'d',note:'s'},alarms:{time:'s',label:'s'},students:{name:'s',price:'n'},ctests:{fails:'n',date:'d'}};
 const ADD_DEF={tasks:{done:false,kind:'Tarea',date:'',time:'',must:false},debts:{paid:false},wish:{done:false,price:0},pains:{resolved:''},alarms:{on:true},runs:{hr:0},events:{result:'',time:'',where:''},lessons:{paid:false,time:'',subject:''},exams:{grade:''},meals:{kcal:0}};
 const DATED=['ctests','moves','debts','gym','runs','meals','sleep','lessons','exams','events','notes','pains'];
@@ -723,7 +723,8 @@ async function askAI(q){aiBusy=true;chat.push({me:q});render();showToast('Pensan
   const before=JSON.stringify(S);let reply=null;
   if(!aiOff){try{const res=await callAI(aiPrompt(q));applyActions(res&&res.actions);updStreak();reply=String((res&&res.reply)||'Hecho.')}
     catch(e){if(e.status===401)reply=(gKey()?'La clave de Gemini no es válida; revísala':'La clave de la app no coincide; revísala')+' en Ajustes. Modo básico: '+localAssistant(q);
-      else if(e.status===429)reply='La IA gratuita ha llegado a su límite por hoy. Modo básico: '+localAssistant(q);
+      else if(e.status===429)reply='Google dice que no hay cupo: '+String(e.message).slice(0,220)+' · Modo básico: '+localAssistant(q);
+      else if(e.status===502)reply='Error de Gemini: '+String(e.message).slice(0,220)+' · Modo básico: '+localAssistant(q);
       else if(e.status===503)aiOff=true}}
   if(reply==null)reply=localAssistant(q);
   const changed=JSON.stringify(S)!==before;if(changed)lastUndo=before;chat.push({ai:reply,undo:changed});aiBusy=false;save();render();showToast(reply.length>150?reply.slice(0,147)+'…':reply,4000)}
