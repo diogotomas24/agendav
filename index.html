@@ -641,8 +641,8 @@ function assistant(o){o=o.trim().replace(/[.!?¿¡]+/g,'').trim();const t=nrm(o)
 
 /* ---------- IA de verdad: Claude interpreta el mensaje y devuelve acciones ---------- */
 let aiBusy=false,aiOff=false;
-const appToken=()=>{try{return localStorage.getItem('av.token')||''}catch(e){return''}};
-async function callAI(prompt){const r=await fetch('/api/ai',{method:'POST',headers:{'content-type':'application/json','x-app-token':appToken()},body:JSON.stringify({prompt})});if(!r.ok){const e=new Error('http '+r.status);e.status=r.status;throw e}return r.json()}
+const appToken=()=>{try{return localStorage.getItem('av.token')||''}catch(e){return''}};const gKey=()=>{try{return localStorage.getItem('av.gkey')||''}catch(e){return''}};const aiHdr=()=>({'content-type':'application/json','x-app-token':appToken(),'x-gemini-key':gKey()});
+async function callAI(prompt){const r=await fetch('/api/ai',{method:'POST',headers:aiHdr(),body:JSON.stringify({prompt})});if(!r.ok){const e=new Error('http '+r.status);e.status=r.status;throw e}return r.json()}
 const SPEC={tasks:{title:'s',kind:'s',date:'d',time:'s',must:'b'},moves:{type:'s',amount:'n',concept:'s',cat:'s',date:'d'},debts:{dir:'s',person:'s',amount:'n',concept:'s',date:'d'},gym:{ex:'s',kg:'n',sets:'n',reps:'n',date:'d'},runs:{type:'s',km:'n',sec:'n',reps:'n',dist:'n',repSec:'n',rest:'n',hr:'n',date:'d'},meals:{when:'s',what:'s',kcal:'n',p:'n',c:'n',f:'n',date:'d'},sleep:{bed:'s',up:'s',date:'d'},lessons:{sid:'s',subject:'s',topic:'s',date:'d',time:'s',paid:'b'},exams:{sid:'s',subject:'s',date:'d',grade:'s'},events:{who:'s',type:'s',date:'d',time:'s',where:'s',result:'s'},bdays:{name:'s',date:'d'},wish:{item:'s',price:'n',pref:'s'},notes:{text:'s'},habits:{name:'s'},pains:{zone:'s',level:'n',since:'d',note:'s'},alarms:{time:'s',label:'s'},students:{name:'s',price:'n'},ctests:{fails:'n',date:'d'}};
 const ADD_DEF={tasks:{done:false,kind:'Tarea',date:'',time:'',must:false},debts:{paid:false},wish:{done:false,price:0},pains:{resolved:''},alarms:{on:true},runs:{hr:0},events:{result:'',time:'',where:''},lessons:{paid:false,time:'',subject:''},exams:{grade:''},meals:{kcal:0}};
 const DATED=['ctests','moves','debts','gym','runs','meals','sleep','lessons','exams','events','notes','pains'];
@@ -722,7 +722,7 @@ function localAssistant(q){const sp=q.split(/\s+y\s+/),parts=sp.length>1&&sp.eve
 async function askAI(q){aiBusy=true;chat.push({me:q});render();showToast('Pensando…',60000);
   const before=JSON.stringify(S);let reply=null;
   if(!aiOff){try{const res=await callAI(aiPrompt(q));applyActions(res&&res.actions);updStreak();reply=String((res&&res.reply)||'Hecho.')}
-    catch(e){if(e.status===401)reply='La clave de la app no coincide; revísala en Ajustes. Modo básico: '+localAssistant(q);
+    catch(e){if(e.status===401)reply=(gKey()?'La clave de Gemini no es válida; revísala':'La clave de la app no coincide; revísala')+' en Ajustes. Modo básico: '+localAssistant(q);
       else if(e.status===429)reply='La IA gratuita ha llegado a su límite por hoy. Modo básico: '+localAssistant(q);
       else if(e.status===503)aiOff=true}}
   if(reply==null)reply=localAssistant(q);
@@ -734,8 +734,8 @@ let foodDay=TODAY,foodDraft=null,foodBusy=false,moneyBusy=false;
 const momentNow=()=>{const h=new Date().getHours()+new Date().getMinutes()/60;return h<11?'Desayuno':h<13?'Media mañana':h<16.5?'Comida':h<19.5?'Merienda':'Cena'};
 const MAC=[['p','Proteínas','prot','#6EA8FF'],['c','Hidratos','carb','#F5C451'],['f','Grasas','fat','#FF8FC7']];
 async function shrinkImg(file){const url=URL.createObjectURL(file);try{const img=new Image();img.src=url;await img.decode();const k=Math.min(1,1024/Math.max(img.naturalWidth,img.naturalHeight)),cv=document.createElement('canvas');cv.width=Math.round(img.naturalWidth*k);cv.height=Math.round(img.naturalHeight*k);cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);return{mime:'image/jpeg',data:cv.toDataURL('image/jpeg',0.82).split(',')[1]}}finally{URL.revokeObjectURL(url)}}
-async function aiData(mode,prompt,file){const body={mode,prompt};if(file)body.image=await shrinkImg(file);const r=await fetch('/api/ai',{method:'POST',headers:{'content-type':'application/json','x-app-token':appToken()},body:JSON.stringify(body)});if(!r.ok)throw r.status;const d=await r.json();return d.data||{}}
-const aiErr=e=>e===401?'Revisa la clave de la app en Ajustes.':e===429?'La IA gratuita ha llegado a su límite por hoy.':e===503?'Falta poner la clave de Gemini en Vercel.':'No he podido analizarlo. Prueba otra vez o apúntalo a mano.';
+async function aiData(mode,prompt,file){const body={mode,prompt};if(file)body.image=await shrinkImg(file);const r=await fetch('/api/ai',{method:'POST',headers:aiHdr(),body:JSON.stringify(body)});if(!r.ok)throw r.status;const d=await r.json();return d.data||{}}
+const aiErr=e=>e===401?'Revisa la clave de la app en Ajustes.':e===429?'La IA gratuita ha llegado a su límite por hoy.':e===503?'Falta poner la clave de Gemini en Ajustes → Asistente.':'No he podido analizarlo. Prueba otra vez o apúntalo a mano.';
 const foodPrompt=(text,img)=>`Eres un nutricionista que estima calorías y macronutrientes de comidas (cocina española habitual). ${img?'Analiza la foto adjunta.':''}${text?' Descripción del usuario: '+JSON.stringify(text)+'.':''}
 Identifica cada alimento, estima la cantidad en gramos con raciones realistas y calcula las calorías (kcal) y los gramos de proteínas (p), hidratos de carbono (c) y grasas (f). Los totales deben ser la suma de los alimentos.
 Responde SOLO con JSON: {"name":"nombre corto del plato","items":[{"name":"","g":0,"kcal":0,"p":0,"c":0,"f":0}],"kcal":0,"p":0,"c":0,"f":0,"note":"una frase breve solo si algo es dudoso"}. Si no hay comida, kcal 0 y explícalo en note.`;
@@ -765,7 +765,7 @@ function foodView(){
 }
 
 /* ---------- servidor ---------- */
-async function apiPost(path,body){const r=await fetch(path,{method:'POST',headers:{'content-type':'application/json','x-app-token':appToken()},body:JSON.stringify(body)});let d={};try{d=await r.json()}catch(e){}if(!r.ok){const e=new Error(d.error||('http '+r.status));e.status=r.status;throw e}return d}
+async function apiPost(path,body){const r=await fetch(path,{method:'POST',headers:aiHdr(),body:JSON.stringify(body)});let d={};try{d=await r.json()}catch(e){}if(!r.ok){const e=new Error(d.error||('http '+r.status));e.status=r.status;throw e}return d}
 const hsh=s=>{let h=2166136261;for(const c of String(s))h=Math.imul(h^c.charCodeAt(0),16777619);return(h>>>0).toString(36)};
 
 /* ---------- AVISOS: la app decide qué avisos quiere y Upstash los envía a su hora ---------- */
@@ -1170,7 +1170,7 @@ function vAjustes(){
      <button class="btn" type="submit">Guardar metas</button><span class="muted" id="goalsMsg" role="status"></span></form>
    ${planForm()}${recurringSection()}
    ${pushCard()}${lockCard()}
-   <form class="card" data-form="token"><h2>Asistente (Gemini)</h2><p class="muted">Si en Vercel pusiste una clave de la app (APP_TOKEN), escríbela aquí una vez. ¿Algo no funciona? Abre <a href="/api/setup" target="_blank" rel="noopener">la página de configuración</a>.</p><label class="lbl" for="tokIn">Clave de la app<input id="tokIn" name="tok" type="password" autocomplete="off" value="${esc(appToken())}"></label><button class="btn ghost" type="submit">Guardar clave</button></form>
+   <form class="card" data-form="token"><h2>Asistente (Gemini)</h2><p class="muted">Pega aquí tu clave de Gemini (aistudio.google.com/apikey). Se guarda solo en este iPhone. Si en Vercel pusiste APP_TOKEN, escríbelo abajo. ¿Algo no funciona? Abre <a href="/api/setup" target="_blank" rel="noopener">la página de configuración</a>.</p><label class="lbl" for="gkIn">Clave de Gemini<input id="gkIn" name="gk" type="password" autocomplete="off" placeholder="AIza… o AQ.…" value="${esc(gKey())}"></label><label class="lbl" for="tokIn">Clave de la app<input id="tokIn" name="tok" type="password" autocomplete="off" value="${esc(appToken())}"></label><button class="btn ghost" type="submit">Guardar clave</button></form>
    <section class="card"><h2>Copia en archivo</h2><p class="muted">Crea un archivo con todos tus datos. En el menú de compartir elige «Guardar en Archivos» → iCloud Drive.${S.lastBackup?' Última copia: '+fdate(S.lastBackup).toLowerCase()+'.':''}</p><button class="btn" data-act="bkFile">Crear copia</button><label class="lbl" for="bkUp">Restaurar desde un archivo<input id="bkUp" type="file" accept="application/json,.json"></label><span class="muted" id="bkUpMsg" role="status"></span></section>
    <section class="card"><h2>Copia de seguridad</h2><p class="muted">Copia este texto y guárdalo (por ejemplo en Drive). En la versión final se hará sola cada noche.</p>
     <textarea id="bkOut" class="mono" readonly aria-label="Copia de tus datos">${esc(JSON.stringify(S))}</textarea>
@@ -1295,7 +1295,7 @@ document.addEventListener('submit',e=>{
   if(k==='moneyDraft'){const amt=parseFloat(String(fd.amount||'').replace(',','.'));if(amt>0){S.moves.push({id:uid(),type:'gasto',amount:Math.round(amt*100)/100,concept:(fd.concept||'Ticket').trim(),cat:fd.cat||'Otros',date:fd.date||TODAY});showToast('Gasto guardado')}moneyDraft=null;save();render();return}
   if(k==='budgets'){const b={};for(const[key,val]of Object.entries(fd))if(+val>0)b[key]=+val;S.budgets=b;save();render();showToast('Presupuestos guardados');return}
   if(k==='potAdd'){const x=find('pots',fd.id),amt=parseFloat(String(fd.amount||'').replace(',','.'));if(x&&amt>0){x.saved=Math.max(0,Math.round(((+x.saved||0)+amt*(+fd.dir||1))*100)/100);save();render();showToast(fd.dir==='-1'?'Sacado de la hucha':'Metido en la hucha')}return}
-  if(k==='token'){try{localStorage.setItem('av.token',(fd.tok||'').trim())}catch(e){}aiOff=false;showToast('Clave guardada');return}
+  if(k==='token'){try{localStorage.setItem('av.token',(fd.tok||'').trim());localStorage.setItem('av.gkey',(fd.gk||'').trim())}catch(e){}aiOff=false;showToast('Clave guardada');return}
   if(k==='ctest'){addCTest(fd.fails);save();render();showToast(`Test apuntado · ${testsDone()} de ${TESTS_DAY} hoy`);return}
   if(k==='editItem'){const it=editing&&find(editing.k,editing.id);if(it){const old=it.name;
     editFields(editing.k,it).forEach(([n,,t])=>{let v=fd[n];if(v===undefined)return;if(t==='number')v=+v;else if(t==='bool')v=v==='1';else if(t==='dur'||t==='durs'){v=toSec(v,t==='dur');if(!(v>0))return}else v=String(v).trim();it[n]=v});

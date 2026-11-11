@@ -1,11 +1,11 @@
 // Asistente de Agenda Vital con Gemini.
 // Modos: 'assistant' (apunta cosas), 'food' (calorías y macros), 'ticket' (lee un ticket),
 //        'weekly' (resumen de la semana), 'shop' (busca opciones de compra en Google).
-import { readBody, checkToken, gemini, parseJSON, shopPrompt } from '../lib/shared.js';
+import { readBody, checkToken, gemini, parseJSON, shopPrompt, userKey } from '../lib/shared.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'method_not_allowed' });
-  if (!checkToken(req, res)) return;
+  if (!userKey(req) && !checkToken(req, res)) return;
   const body = readBody(req);
   const mode = ['food', 'ticket', 'weekly', 'shop'].includes(body.mode) ? body.mode : 'assistant';
 
@@ -26,13 +26,13 @@ export default async function handler(req, res) {
 
   let out;
   try {
-    const r = await gemini(parts, { search: mode === 'shop' });
+    const r = await gemini(parts, { search: mode === 'shop', key: userKey(req) });
     const data = parseJSON(r.text);
     if (!data || typeof data !== 'object') return res.status(502).json({ error: 'bad_json' });
     if (mode === 'shop') data.sources = r.sources;
     out = data;
   } catch (e) {
-    return res.status(e.code === 429 ? 429 : e.code === 503 ? 503 : 502).json({ error: e.message.slice(0, 200) });
+    return res.status(e.code === 429 ? 429 : e.code === 503 ? 503 : e.code === 401 ? 401 : 502).json({ error: e.message.slice(0, 200) });
   }
   if (mode !== 'assistant') return res.status(200).json({ data: out });
   return res.status(200).json({ reply: String(out.reply || ''), actions: Array.isArray(out.actions) ? out.actions : [] });
