@@ -1,5 +1,5 @@
 // Avisos: la app manda los avisos que quiere para los próximos días y aquí se programan en Upstash.
-import { readBody, checkToken, baseUrl, qstash, forwardToken, sendPush, pushReady } from '../lib/shared.js';
+import { readBody, checkToken, baseUrl, qstash, forwardToken, userKey, sendPush, pushReady } from '../lib/shared.js';
 
 export default async function handler(req, res) {
   if (req.method === 'GET') return res.status(200).json({ publicKey: process.env.VAPID_PUBLIC_KEY || '', ready: pushReady() });
@@ -40,7 +40,7 @@ export default async function handler(req, res) {
       if (!it.name || !(+it.max > 0)) return res.status(400).json({ error: 'need_name_and_max' });
       // Una vez al día a las 08:00 UTC (09:00 o 10:00 en España).
       const r = await qstash('POST', '/v2/schedules/' + baseUrl(req) + '/api/watch', {
-        headers: { 'Upstash-Cron': '0 8 * * *', 'Upstash-Retries': '1', ...forwardToken() },
+        headers: { 'Upstash-Cron': '0 8 * * *', 'Upstash-Retries': '1', ...forwardToken(), ...(userKey(req) ? { 'Upstash-Forward-X-Gemini-Key': userKey(req) } : {}) },
         body: { sub, item: { id: String(it.id || ''), name: String(it.name).slice(0, 200), max: +it.max, pref: String(it.pref || '').slice(0, 300) } }
       });
       return res.status(200).json({ scheduleId: r.scheduleId || '' });
